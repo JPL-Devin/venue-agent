@@ -66,17 +66,8 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse, FileResponse, Response
 # from core import core_util
-from core.core_utils import EVRType, ChannelType, AlarmTypeMap, DpStatus
-from core.schema import MtakStartBodyModel, FswCmdBodyModel, HwCmdBodyModel, \
-    SseCmdBodyModel, BinaryFileBodyModel, ScmfFileBodyModel, \
-    EvrRtBodyModel, EvrRtMultiBodyModel, EvrChillBodyModel, EvrChillMultiBodyModel, EVRObjectResp, \
-    EhaRtBodyModel, EhaRtMultiBodyModel, EhaChillBodyModel, EhaChillMultiBodyModel, ChannelValueObjectRespModel, \
-    DpBodyModel, DataProductObjectRespModel, \
-    Parse1553BodyModel, Bus1553LogObject, \
-    ScriptStartBodyModel, ScriptStatusBodyModel, ScriptStatusResp, ScriptHaltBodyModel, ScriptRunInfo, \
-    HealthStatus, HealthStatusEnum, \
-    MtakStartResponse, ErrorResponse, \
-    CmdDispatchedResp, TimeType
+from core.schema import ScriptStartBodyModel, ScriptStatusBodyModel, ScriptStatusResp, ScriptHaltBodyModel, ScriptRunInfo, \
+    HealthStatus, HealthStatusEnum, ErrorResponse
 from fastapi.exceptions import RequestValidationError
 import utils
 
@@ -85,14 +76,6 @@ utils.print_key_info()
 LOG_CONFIG_YAML = 'log_config.yaml'
 
 prefix_router = APIRouter(prefix='/api/v3')
-
-
-def check_default_cmd_string(default_cmd_string):
-  # if string_id is value 'default' set string_id to None. Else, proceed with input string id
-  if default_cmd_string in ['A', 'B', 'AB']:
-    return default_cmd_string
-  else:
-    return None
 
 
 @prefix_router.get('/health', 
