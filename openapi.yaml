@@ -1,1430 +1,9 @@
-components:
-  schemas:
-    AlarmType:
-      description: An enumeration.
-      enum:
-      - RED_ALARM
-      - YELLOW_ALARM
-      - ANY_ALARM
-      title: AlarmType
-      type: string
-    BinaryFileBodyModel:
-      properties:
-        fileType:
-          description: The file type that should be used to build the binary file
-            into a SCMF
-          title: Filetype
-          type: integer
-        overwrite:
-          default: true
-          description: if True will overwrite any existing onboard file
-          title: Overwrite
-          type: boolean
-        sessionId:
-          description: The AMPCS session to send the command through
-          title: Sessionid
-          type: integer
-        sourceFilePath:
-          description: 'The full path on GDS host (ex: /proj/europa/sit/current/files/myfile.data)'
-          title: Sourcefilepath
-          type: string
-        stringSelection:
-          allOf:
-          - $ref: '#/components/schemas/StringSelection'
-          default: DEFAULT
-          description: Specifies the MTAK string to send the command
-        targetFilePath:
-          description: The full onboard path (i.e. /eng1/myfile.data
-          title: Targetfilepath
-          type: string
-        timeout:
-          default: 10
-          description: The timeout on the dispatch process in seconds
-          minimum: 0.0
-          title: Timeout
-          type: integer
-      required:
-      - sessionId
-      - sourceFilePath
-      - targetFilePath
-      - fileType
-      title: BinaryFileBodyModel
-      type: object
-    Bus1553LogObject:
-      properties:
-        bus_name:
-          default: ''
-          description: Serial bus name
-          title: Bus Name
-          type: string
-        converted_value:
-          default: ''
-          description: Readable representation of the data value
-          title: Converted Value
-          type: string
-        data_type:
-          default: ''
-          description: The response type for the parsed log entry. UINT, HEX, BIN,
-            etc.
-          title: Data Type
-          type: string
-        data_value:
-          default: ''
-          description: Parsed log files are evaluated based on their data type. For
-            enums, the data value correlates to a converted value.
-          title: Data Value
-          type: string
-        dictionary:
-          default: ''
-          description: Path to Bus 1553 xml dictionary used to decode the log file
-          title: Dictionary
-          type: string
-        error_status:
-          default: ''
-          description: Error status for the log file entry
-          title: Error Status
-          type: string
-        log_file:
-          default: ''
-          description: 1553 log file located in GDS
-          title: Log File
-          type: string
-        rti:
-          default: 0
-          description: Return time interval
-          title: Rti
-          type: integer
-        status_word:
-          default: ''
-          description: Status word field for the log file entry
-          title: Status Word
-          type: string
-        time_scet:
-          default: ''
-          description: SCET time record for log file entry
-          title: Time Scet
-          type: string
-        time_sclk:
-          default: ''
-          description: SCLK time record for log file entry
-          title: Time Sclk
-          type: string
-        variables:
-          default: ''
-          description: 1553 dictionary variable name
-          title: Variables
-          type: string
-      title: Bus1553LogObject
-      type: object
-    ChannelValueObjectRespModel:
-      properties:
-        channelId:
-          default: ''
-          description: The Id of the EHA channel
-          title: Channelid
-          type: string
-        channelName:
-          default: ''
-          description: The name of the EHA channel
-          title: Channelname
-          type: string
-        channelStatus:
-          default: ''
-          description: The string status of the channel if it is a table-driven channel
-            (only for boolean and status type channels)
-          title: Channelstatus
-          type: string
-        channelType:
-          default: ''
-          description: The type of the EHA channel
-          title: Channeltype
-          type: string
-        dn:
-          default: ''
-          description: Data number value. Only returns string for now
-          title: Dn
-          type: string
-        dnAlarmState:
-          default: ''
-          description: Indicates if the channel measurement is in alarm (on DN values)
-          title: Dnalarmstate
-          type: string
-        ert:
-          default: ''
-          description: Earth received (ISO-formatted) time when this value was received
-          title: Ert
-          type: string
-        eu:
-          default: 0.0
-          description: Engineering unit value
-          title: Eu
-          type: number
-        euAlarmState:
-          default: ''
-          description: Indicates if the channel measurement is in alarm (on EU values)
-          title: Eualarmstate
-          type: string
-        isRecorded:
-          default: false
-          description: True if this is a recorded EHA, false otherwise
-          title: Isrecorded
-          type: boolean
-        scet:
-          default: ''
-          description: Correlated SCLK time in ISO format
-          title: Scet
-          type: string
-        sclk:
-          default: ''
-          description: SCLK when this value was read
-          title: Sclk
-          type: string
-        sessionId:
-          default: 0
-          description: The AMPCS session ID that the result came from
-          title: Sessionid
-          type: integer
-        vcId:
-          default: 0
-          description: The virtual channel ID that the result came from
-          title: Vcid
-          type: integer
-      title: ChannelValueObjectRespModel
-      type: object
-    CmdDispatchedResp:
-      properties:
-        cmdRequested:
-          default: ''
-          description: This mirrors what was received as the requested command string
-          title: Cmdrequested
-          type: string
-        dispatchTime:
-          default: ''
-          description: 'Time that the dispatch occurred. Example: 2017-09-25T03:57:42.676Z'
-          title: Dispatchtime
-          type: string
-      title: CmdDispatchedResp
-      type: object
-    CustomScriptOutputs:
-      properties:
-        entries:
-          allOf:
-          - $ref: '#/components/schemas/ScriptEntriesModel'
-          default: {}
-          description: Custom script entries
-          title: Entries
-        output_array:
-          default: []
-          description: Custom script output array
-          items:
-            type: object
-          title: Output Array
-          type: array
-        outputs:
-          default: {}
-          description: Custom script outputs fields
-          title: Outputs
-          type: object
-      title: CustomScriptOutputs
-      type: object
-    CustomScriptStatus:
-      description: An enumeration.
-      enum:
-      - PENDING
-      - ERROR
-      - PASS
-      - FAIL
-      title: CustomScriptStatus
-      type: string
-    DataProductObjectRespModel:
-      properties:
-        apId:
-          default: 0
-          description: APID of data product to be retrieved
-          title: Apid
-          type: integer
-        apIdProductType:
-          default: ''
-          description: Name of the data product type per apid.xml
-          title: Apidproducttype
-          type: string
-        creationTime:
-          default: ''
-          description: The time the product was created on the ground, which is slightly
-            different from the time the packets are received (ERT)
-          title: Creationtime
-          type: string
-        dpStatus:
-          default: ''
-          description: Data product status
-          title: Dpstatus
-          type: string
-        ert:
-          default: ''
-          description: Earth received (ISO-formatted) time when this product was received
-          title: Ert
-          type: string
-        filePath:
-          default: ''
-          description: Data product file path
-          title: Filepath
-          type: string
-        fileSize:
-          default: 0
-          description: Data product file size
-          title: Filesize
-          type: integer
-        scet:
-          default: ''
-          description: ISO-formatted spacecraft event time when this product was created
-          title: Scet
-          type: string
-        sclk:
-          default: ''
-          description: SCLK for this product
-          title: Sclk
-          type: string
-        sessionId:
-          default: 0
-          description: The AMPCS session ID
-          title: Sessionid
-          type: integer
-        vcId:
-          default: 0
-          description: The virtual channel ID
-          title: Vcid
-          type: integer
-      title: DataProductObjectRespModel
-      type: object
-    DefaultCmdString:
-      description: An enumeration.
-      enum:
-      - A
-      - B
-      - AB
-      title: DefaultCmdString
-      type: string
-    DpBodyModel:
-      properties:
-        apIds:
-          default: []
-          description: APID of data product to be retrieved
-          items:
-            type: integer
-          title: Apids
-          type: array
-        dpStatus:
-          allOf:
-          - $ref: '#/components/schemas/Dpstatus'
-          default: ALL
-          description: Data product status
-        endTime:
-          description: 'Query end time. For SCET/ERT: 2009-202T12:35:00 (UTC). For
-            SCLK: 0410313966 (second resolution only)'
-          title: Endtime
-          type: string
-        sessionId:
-          description: The AMPCS session to query against
-          title: Sessionid
-          type: integer
-        startTime:
-          description: 'Query start time. For SCET/ERT: 2009-202T12:35:00 (UTC). For
-            SCLK: 0410313966 (second resolution only)'
-          title: Starttime
-          type: string
-        timeType:
-          allOf:
-          - $ref: '#/components/schemas/TimeType'
-          default: ERT
-          description: The time type to use to query
-        timeout:
-          default: 240
-          description: How long to wait in seconds for results to return
-          minimum: 0.0
-          title: Timeout
-          type: integer
-      required:
-      - sessionId
-      title: DpBodyModel
-      type: object
-    Dpstatus:
-      description: An enumeration.
-      enum:
-      - ALL
-      - COMPLETE
-      - PARTIAL
-      title: Dpstatus
-      type: string
-    EVRObjectResp:
-      properties:
-        ert:
-          default: ''
-          description: Earth received (ISO-formatted) time
-          title: Ert
-          type: string
-        eventId:
-          default: 0
-          description: EVR event ID
-          title: Eventid
-          type: integer
-        evrLevel:
-          default: ''
-          description: Level of EVR
-          title: Evrlevel
-          type: string
-        evrMessage:
-          default: ''
-          description: Message that this EVR contains
-          title: Evrmessage
-          type: string
-        evrModule:
-          default: ''
-          description: FSW module that generated this EVR
-          title: Evrmodule
-          type: string
-        evrName:
-          default: ''
-          description: Name of the EVR
-          title: Evrname
-          type: string
-        fromSSE:
-          default: false
-          description: True if EVR is frome SSE, false otherwise
-          title: Fromsse
-          type: boolean
-        isRecorded:
-          default: false
-          description: True if this is a recorded EVR (from data products)
-          title: Isrecorded
-          type: boolean
-        scet:
-          default: ''
-          description: ISO-formatted spacecraft event time
-          title: Scet
-          type: string
-        sclk:
-          default: ''
-          description: SCLK for this EVR
-          title: Sclk
-          type: string
-        sessionId:
-          default: 0
-          description: The AMPCS session ID
-          title: Sessionid
-          type: integer
-        vcId:
-          default: 0
-          description: The virtual channel ID
-          title: Vcid
-          type: integer
-      title: EVRObjectResp
-      type: object
-    EhaChillBodyModel:
-      properties:
-        channelIds:
-          default: []
-          description: The channel IDs to search for
-          items:
-            type: string
-          title: Channelids
-          type: array
-        channelTypes:
-          default: []
-          description: The channel types to query. If not provided, will query FSW
-            realtime and recorded.
-          items:
-            $ref: '#/components/schemas/EhaType'
-          type: array
-        endTime:
-          description: 'Query end time. For SCET/ERT: 2009-202T12:35:00 (UTC). For
-            SCLK: 0410313966 (second resolution only)'
-          title: Endtime
-          type: string
-        inAlarm:
-          allOf:
-          - $ref: '#/components/schemas/AlarmType'
-          description: Filter resulting channels based on alarm status
-        sessionId:
-          description: The AMPCS session to query against
-          title: Sessionid
-          type: integer
-        startTime:
-          description: 'Query start time. For SCET/ERT: 2009-202T12:35:00 (UTC). For
-            SCLK: 0410313966 (second resolution only)'
-          title: Starttime
-          type: string
-        timeType:
-          allOf:
-          - $ref: '#/components/schemas/TimeType'
-          default: ERT
-          description: The time format to use to query and to sort the resulting values
-        timeout:
-          default: 240
-          description: How long to wait in seconds for results to return
-          minimum: 0.0
-          title: Timeout
-          type: integer
-      required:
-      - sessionId
-      title: EhaChillBodyModel
-      type: object
-    EhaChillMultiBodyModel:
-      properties:
-        channelIds:
-          default: []
-          description: The channel IDs to search for
-          items:
-            type: string
-          title: Channelids
-          type: array
-        channelTypes:
-          default: []
-          description: The channel types to query. If not provided, will query FSW
-            realtime and recorded.
-          items:
-            $ref: '#/components/schemas/EhaType'
-          type: array
-        endTime:
-          description: 'Query end time. For SCET/ERT: 2009-202T12:35:00 (UTC). For
-            SCLK: 0410313966 (second resolution only)'
-          title: Endtime
-          type: string
-        inAlarm:
-          allOf:
-          - $ref: '#/components/schemas/AlarmType'
-          description: Filter resulting channels based on alarm status
-        sessionId:
-          description: The AMPCS session to query against
-          title: Sessionid
-          type: integer
-        startTime:
-          description: 'Query start time. For SCET/ERT: 2009-202T12:35:00 (UTC). For
-            SCLK: 0410313966 (second resolution only)'
-          title: Starttime
-          type: string
-        timeType:
-          allOf:
-          - $ref: '#/components/schemas/TimeType'
-          default: ERT
-          description: The time format to use to query and to sort the resulting values
-        timeout:
-          default: 240
-          description: How long to wait in seconds for results to return
-          minimum: 0.0
-          title: Timeout
-          type: integer
-      required:
-      - sessionId
-      title: EhaChillMultiBodyModel
-      type: object
-    EhaRtBodyModel:
-      properties:
-        channelId:
-          description: The channel ID to search for
-          title: Channelid
-          type: string
-        endTime:
-          description: Query end time in ERT DOY UTC (2009-202T12:35:00)
-          title: Endtime
-          type: string
-        sessionId:
-          description: The AMPCS session to query against
-          title: Sessionid
-          type: integer
-        startTime:
-          description: Query start time in ERT DOY UTC (2009-202T12:35:00)
-          title: Starttime
-          type: string
-        timeout:
-          default: 240
-          description: How long to wait in seconds for results to return
-          minimum: 0.0
-          title: Timeout
-          type: integer
-      required:
-      - startTime
-      - endTime
-      title: EhaRtBodyModel
-      type: object
-    EhaRtMultiBodyModel:
-      properties:
-        channelIds:
-          description: The channel IDs to search for
-          items:
-            type: string
-          title: Channelids
-          type: array
-        endTime:
-          description: Query end time in ERT DOY UTC (2009-202T12:35:00)
-          title: Endtime
-          type: string
-        sessionId:
-          description: The AMPCS session to query against
-          title: Sessionid
-          type: integer
-        startTime:
-          description: Query start time in ERT DOY UTC (2009-202T12:35:00)
-          title: Starttime
-          type: string
-        timeout:
-          default: 240
-          description: How long to wait in seconds for results to return
-          minimum: 0.0
-          title: Timeout
-          type: integer
-      required:
-      - channelIds
-      - startTime
-      - endTime
-      title: EhaRtMultiBodyModel
-      type: object
-    EhaType:
-      description: An enumeration.
-      enum:
-      - FSW_REALTIME
-      - FSW_RECORDED
-      - SSE
-      title: EhaType
-      type: string
-    ErrorResponse:
-      properties:
-        message:
-          default: ''
-          description: Error message
-          title: Message
-          type: string
-      title: ErrorResponse
-      type: object
-    EvrChillBodyModel:
-      properties:
-        endTime:
-          description: 'Query end time. For SCET/ERT: 2009-202T12:35:00 (UTC). For
-            SCLK: 0410313966 (second resolution only)'
-          title: Endtime
-          type: string
-        eventId:
-          description: Event IDs of EVRs to retreive
-          title: Eventid
-          type: integer
-        evrLevel:
-          description: Level of EVRs to return. Note that levels are project specific
-            and requesting a level that does not exist will return nothing
-          title: Evrlevel
-          type: string
-        evrModule:
-          description: Module of EVRs to retreive
-          title: Evrmodule
-          type: string
-        evrName:
-          description: Name of EVRs to retrieve. SQL style pattern can be used such
-            as % as a wildcard
-          title: Evrname
-          type: string
-        evrType:
-          default: []
-          description: The type of EVRs to query. If not specified, will query FSW
-            realtime and recorded EVRs
-          items:
-            $ref: '#/components/schemas/EvrType'
-          type: array
-        sessionId:
-          description: The AMPCS session to query against
-          title: Sessionid
-          type: integer
-        startTime:
-          description: 'Query start time. For SCET/ERT: 2009-202T12:35:00 (UTC). For
-            SCLK: 0410313966 (second resolution only)'
-          title: Starttime
-          type: string
-        timeType:
-          allOf:
-          - $ref: '#/components/schemas/TimeType'
-          default: ERT
-          description: The time type to use to query
-        timeout:
-          default: 240
-          description: How long to wait in seconds for results to return
-          minimum: 0.0
-          title: Timeout
-          type: integer
-      required:
-      - sessionId
-      title: EvrChillBodyModel
-      type: object
-    EvrChillMultiBodyModel:
-      properties:
-        endTime:
-          description: 'Query end time. For SCET/ERT: 2009-202T12:35:00 (UTC). For
-            SCLK: 0410313966 (second resolution only)'
-          title: Endtime
-          type: string
-        eventIds:
-          default: []
-          description: Event IDs of EVRs to retreive
-          items:
-            type: integer
-          title: Eventids
-          type: array
-        evrLevels:
-          default: []
-          description: Levels of EVRs to return. Note that levels are project specific.
-          items:
-            type: string
-          title: Evrlevels
-          type: array
-        evrModules:
-          default: []
-          description: Modules of EVRs to retreive
-          items:
-            type: string
-          title: Evrmodules
-          type: array
-        evrNames:
-          default: []
-          description: Name of EVRs to retrieve. No wildcard is supported
-          items:
-            type: string
-          title: Evrnames
-          type: array
-        evrType:
-          default: []
-          description: The type of EVRs to query. If not specified, will query FSW
-            realtime and recorded EVRs
-          items:
-            $ref: '#/components/schemas/EvrType'
-          type: array
-        sessionId:
-          description: The AMPCS session to query against
-          title: Sessionid
-          type: integer
-        startTime:
-          description: 'Query start time. For SCET/ERT: 2009-202T12:35:00 (UTC). For
-            SCLK: 0410313966 (second resolution only)'
-          title: Starttime
-          type: string
-        timeType:
-          allOf:
-          - $ref: '#/components/schemas/TimeType'
-          default: ERT
-          description: The time type to use to query
-        timeout:
-          default: 240
-          description: How long to wait in seconds for results to return
-          minimum: 0.0
-          title: Timeout
-          type: integer
-      required:
-      - sessionId
-      title: EvrChillMultiBodyModel
-      type: object
-    EvrRtBodyModel:
-      properties:
-        endTime:
-          description: Query end time in ERT DOY UTC (2009-202T12:35:00)
-          title: Endtime
-          type: string
-        eventId:
-          description: EVR event ID
-          title: Eventid
-          type: integer
-        evrLevel:
-          description: Filter by EVR level. Wildcard * can be used. Note that EVR
-            levels are project specific.
-          title: Evrlevel
-          type: string
-        evrName:
-          description: Name of EVRs to query. Wildcard * can be used.
-          title: Evrname
-          type: string
-        sessionId:
-          description: The AMPCS session to qury against
-          title: Sessionid
-          type: integer
-        startTime:
-          description: Query start time in ERT DOY UTC (2009-202T12:35:00)
-          title: Starttime
-          type: string
-        timeout:
-          default: 240
-          description: How long to wait in seconds for results to return
-          minimum: 0.0
-          title: Timeout
-          type: integer
-      required:
-      - sessionId
-      - startTime
-      - endTime
-      title: EvrRtBodyModel
-      type: object
-    EvrRtMultiBodyModel:
-      properties:
-        endTime:
-          description: Query end time in ERT DOY UTC (2009-202T12:35:00)
-          title: Endtime
-          type: string
-        eventIds:
-          default: []
-          description: Event IDs of EVRs to retreive
-          items:
-            type: integer
-          title: Eventids
-          type: array
-        evrLevels:
-          default: []
-          description: Levels of EVRs to return. Note that levels are project specific.
-          items:
-            type: string
-          title: Evrlevels
-          type: array
-        evrNames:
-          default: []
-          description: Name of EVRs to retrieve. No wildcard is supported
-          items:
-            type: string
-          title: Evrnames
-          type: array
-        sessionId:
-          description: The AMPCS session to qury against
-          title: Sessionid
-          type: integer
-        startTime:
-          description: Query start time in ERT DOY UTC (2009-202T12:35:00)
-          title: Starttime
-          type: string
-        timeout:
-          default: 240
-          description: How long to wait in seconds for results to return
-          minimum: 0.0
-          title: Timeout
-          type: integer
-      required:
-      - sessionId
-      - startTime
-      - endTime
-      title: EvrRtMultiBodyModel
-      type: object
-    EvrType:
-      description: An enumeration.
-      enum:
-      - FSW_REALTIME
-      - FSW_RECORDED
-      - SSE
-      title: EvrType
-      type: string
-    FswCmdBodyModel:
-      properties:
-        commandString:
-          description: The command string including the command stem and any arguments
-          title: Commandstring
-          type: string
-        sessionId:
-          description: The AMPCS session to send the command through
-          title: Sessionid
-          type: integer
-        stringSelection:
-          allOf:
-          - $ref: '#/components/schemas/StringSelection'
-          default: DEFAULT
-          description: Which sides of flight computer the command is for
-        timeout:
-          default: 10
-          description: The timeout on the dispatch process in seconds
-          minimum: 0.0
-          title: Timeout
-          type: integer
-        validate:
-          default: true
-          description: Flag for AMPCS to validate the command against the FSW dict
-            before radiating
-          title: Validate
-          type: boolean
-      required:
-      - sessionId
-      - commandString
-      title: FswCmdBodyModel
-      type: object
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          title: Detail
-          type: array
-      title: HTTPValidationError
-      type: object
-    HealthStatus:
-      properties:
-        message:
-          description: status message
-          title: Message
-          type: string
-        status:
-          allOf:
-          - $ref: '#/components/schemas/HealthStatusEnum'
-          description: health status
-      required:
-      - status
-      - message
-      title: HealthStatus
-      type: object
-    HealthStatusEnum:
-      description: An enumeration.
-      enum:
-      - OK
-      - ERROR
-      - UNKNOWN
-      title: HealthStatusEnum
-      type: string
-    HwCmdBodyModel:
-      properties:
-        commandStem:
-          description: The command stem of the HW Command
-          title: Commandstem
-          type: string
-        sessionId:
-          description: The AMPCS session to send this file through
-          title: Sessionid
-          type: integer
-        stringSelection:
-          allOf:
-          - $ref: '#/components/schemas/StringSelection'
-          default: DEFAULT
-          description: Specifies the MTAK string to send the command
-        timeout:
-          default: 10
-          description: The timeout on the dispatch process in seconds
-          minimum: 0.0
-          title: Timeout
-          type: integer
-      required:
-      - sessionId
-      - commandStem
-      title: HwCmdBodyModel
-      type: object
-    MtakStartBodyModel:
-      properties:
-        defaultCmdString:
-          allOf:
-          - $ref: '#/components/schemas/DefaultCmdString'
-          default: AB
-          description: Which sides of flight computer the command is for. This will
-            be used if default is used for stringSelection.
-        sessionIds:
-          description: AMPCS session ids to start MTAK on
-          items:
-            type: integer
-          title: Sessionids
-          type: array
-        timeout:
-          default: 30
-          description: How long to wait until timeout in seconds. The minimum is 25
-            seconds since MTAK takes some time to start
-          minimum: 25.0
-          title: Timeout
-          type: integer
-      required:
-      - sessionIds
-      title: MtakStartBodyModel
-      type: object
-    MtakStartResponse:
-      properties:
-        sessionIds:
-          description: AMPCS session ids
-          items:
-            type: integer
-          title: Sessionids
-          type: array
-        startTime:
-          description: Time that MTAK started
-          title: Starttime
-          type: string
-      required:
-      - sessionIds
-      - startTime
-      title: MtakStartResponse
-      type: object
-    Parse1553BodyModel:
-      properties:
-        duration:
-          description: Number of seconds elapsed from start time, used to establish
-            an end time
-          title: Duration
-          type: integer
-        end_time:
-          description: 'The end time indicates the earliest record that will be parsed.
-            SCET: "2009-202T12:35:00" DOY or "2009-01-20T12:00:00" ISO formats are
-            accepted. SCLK: "0410313966.123"'
-          title: End Time
-          type: string
-        start_time:
-          description: 'The start time indicates the earliest record that will be
-            parsed. SCET: "2009-202T12:35:00" DOY or "2009-01-20T12:00:00" ISO formats
-            are accepted. SCLK: "0410313966.123"'
-          title: Start Time
-          type: string
-        time_type:
-          allOf:
-          - $ref: '#/components/schemas/TimeType1553'
-          default: SCET
-          description: Time type for the query start and end time
-        variables:
-          description: Variable name used to parse 1553 log file
-          title: Variables
-          type: string
-      required:
-      - variables
-      title: Parse1553BodyModel
-      type: object
-    ScmfFileBodyModel:
-      properties:
-        disableChecks:
-          default: false
-          description: Disables the check done by AMPCS for invalid scmf file
-          title: Disablechecks
-          type: boolean
-        filePath:
-          description: 'The full path on GDS host (ex: /proj/europa/sit/current/files/myfile.scmf)'
-          title: Filepath
-          type: string
-        sessionId:
-          description: The AMPCS session to send the command through
-          title: Sessionid
-          type: integer
-        timeout:
-          default: 10
-          description: The timeout on the dispatch process in seconds
-          minimum: 0.0
-          title: Timeout
-          type: integer
-      required:
-      - sessionId
-      - filePath
-      title: ScmfFileBodyModel
-      type: object
-    ScriptEntriesModel:
-      properties:
-        entry_output_array:
-          default: []
-          description: Custom script entry output array
-          items:
-            type: object
-          title: Entry Output Array
-          type: array
-        entry_outputs:
-          default: {}
-          description: Custom script entry outputs
-          title: Entry Outputs
-          type: object
-        verification_status:
-          allOf:
-          - $ref: '#/components/schemas/VerificationStatus'
-          default: PENDING
-          description: Verification status for the specified entry
-      title: ScriptEntriesModel
-      type: object
-    ScriptHaltBodyModel:
-      properties:
-        scriptRunId:
-          description: custom script ID for the running custom script
-          title: Scriptrunid
-          type: string
-      required:
-      - scriptRunId
-      title: ScriptHaltBodyModel
-      type: object
-    ScriptRunInfo:
-      properties:
-        scriptRunId:
-          description: id of the running script
-          title: Scriptrunid
-          type: string
-      required:
-      - scriptRunId
-      title: ScriptRunInfo
-      type: object
-    ScriptStartBodyModel:
-      properties:
-        inputs:
-          default: {}
-          description: Dictionary of custom script inputs and corresponding values
-          title: Inputs
-          type: object
-        outputs:
-          default: {}
-          description: Dictionary of custom script outputs
-          title: Outputs
-          type: object
-        scriptHash:
-          description: SHA256 hash of custom script file
-          title: Scripthash
-          type: string
-        scriptName:
-          description: Name of custom script
-          title: Scriptname
-          type: string
-        scriptPath:
-          description: Relative path of custom script from custom script root directory
-          title: Scriptpath
-          type: string
-      required:
-      - scriptName
-      - scriptPath
-      - scriptHash
-      title: ScriptStartBodyModel
-      type: object
-    ScriptStatusBodyModel:
-      properties:
-        scriptRunId:
-          description: custom script ID for the running custom script
-          title: Scriptrunid
-          type: string
-      required:
-      - scriptRunId
-      title: ScriptStatusBodyModel
-      type: object
-    ScriptStatusResp:
-      properties:
-        custom_script_outputs:
-          allOf:
-          - $ref: '#/components/schemas/CustomScriptOutputs'
-          default: {}
-          description: Object that contains all current output values from the executed
-            custom script
-          title: Custom Script Outputs
-        custom_script_status:
-          allOf:
-          - $ref: '#/components/schemas/CustomScriptStatus'
-          default: PENDING
-          description: The current status of the executed custom script
-        logfile_lines:
-          default: []
-          description: last 25 lines of the custom script log file
-          items:
-            type: string
-          title: Logfile Lines
-          type: array
-        logfile_path:
-          default: ''
-          description: The absolute path (on GDS host) to the custom script log file
-          title: Logfile Path
-          type: string
-        logfile_url:
-          default: ''
-          description: Relative URL of download end point of logs. "custom_script/{script_run_id}/files"
-          title: Logfile Url
-          type: string
-      title: ScriptStatusResp
-      type: object
-    SseCmdBodyModel:
-      properties:
-        commandString:
-          description: The command string including the command stem and any arguments
-          title: Commandstring
-          type: string
-        sessionId:
-          description: The AMPCS session to send the command through
-          title: Sessionid
-          type: integer
-        timeout:
-          default: 10
-          description: The timeout on the dispatch process in seconds
-          minimum: 0.0
-          title: Timeout
-          type: integer
-      required:
-      - sessionId
-      - commandString
-      title: SseCmdBodyModel
-      type: object
-    StringSelection:
-      description: An enumeration.
-      enum:
-      - DEFAULT
-      - A
-      - B
-      - AB
-      title: StringSelection
-      type: string
-    TimeType:
-      description: An enumeration.
-      enum:
-      - ERT
-      - SCET
-      - SCLK
-      title: TimeType
-      type: string
-    TimeType1553:
-      description: An enumeration.
-      enum:
-      - SCET
-      - SCLK
-      title: TimeType1553
-      type: string
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          title: Location
-          type: array
-        msg:
-          title: Message
-          type: string
-        type:
-          title: Error Type
-          type: string
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-      type: object
-    VerificationStatus:
-      description: An enumeration.
-      enum:
-      - PENDING
-      - ERROR
-      - PASS
-      - FAIL
-      title: VerificationStatus
-      type: string
 info:
   description: RESTful API of Ingenium VenueServer that interfaces with test venues
   title: Ingenium VenueServer
-  version: 14.1-TP
-openapi: 3.0.2
+  version: 3.0-non-ampcs
+openapi: 3.1.0
 paths:
-  /api/v3/bus1553:
-    get:
-      description: variables is the name of a single variable, which is defined in
-        a Bus 1553 dictionary.
-      operationId: decode_1553_api_v3_bus1553_get
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Parse1553BodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/Bus1553LogObject'
-                title: Response 200 Decode 1553 Api V3 Bus1553 Get
-                type: array
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Parse Bus 1553 log files to query a variable defined in a Bus 1553
-        dictionary
-      tags:
-      - BUS_1553
-  /api/v3/cmd/binary_file:
-    post:
-      operationId: binary_file_api_v3_cmd_binary_file_post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BinaryFileBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CmdDispatchedResp'
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Upload a file to flight computer via MTAK
-      tags:
-      - COMMAND
-  /api/v3/cmd/fsw_cmd:
-    post:
-      operationId: fsw_cmd_api_v3_cmd_fsw_cmd_post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FswCmdBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CmdDispatchedResp'
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Send a FSW command via MTAK
-      tags:
-      - COMMAND
-  /api/v3/cmd/hw_cmd:
-    post:
-      operationId: hw_cmd_api_v3_cmd_hw_cmd_post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HwCmdBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CmdDispatchedResp'
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Send a HW command via MTAK
-      tags:
-      - COMMAND
-  /api/v3/cmd/scmf:
-    post:
-      operationId: scmf_file_api_v3_cmd_scmf_post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ScmfFileBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CmdDispatchedResp'
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Upload a SCMF file to flight
-      tags:
-      - COMMAND
-  /api/v3/cmd/sse:
-    post:
-      description: Send a SSE (Simulation and Support Equipment) command via MTAK
-      operationId: sse_cmd_api_v3_cmd_sse_post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SseCmdBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CmdDispatchedResp'
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Send a SSE command via MTAK
-      tags:
-      - COMMAND
   /api/v3/custom_script/halt:
     post:
       operationId: script_halt_api_v3_custom_script_halt_post
@@ -1457,11 +36,12 @@ paths:
           description: Forbidden
       summary: Halt custom script specified
       tags:
-      - SCRIPT
+        - SCRIPT
   /api/v3/custom_script/start:
     post:
-      description: This will start the custom script and return. Use status endpoint
-        to get its status.
+      description: >-
+        This will start the custom script and return. Use status endpoint to get
+        its status.
       operationId: script_start_api_v3_custom_script_start_post
       requestBody:
         content:
@@ -1496,8 +76,8 @@ paths:
           description: Forbidden
       summary: Start execution of a custom script
       tags:
-      - SCRIPT
-  /api/v3/custom_script/status:
+        - SCRIPT
+  /api/v3/custom_script/status::
     get:
       operationId: script_status_api_v3_custom_script_status_get
       requestBody:
@@ -1505,7 +85,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ScriptStatusBodyModel'
-        required: true
       responses:
         '200':
           content:
@@ -1533,17 +112,17 @@ paths:
           description: Forbidden
       summary: Retrieve status information from currently executing script
       tags:
-      - SCRIPT
+        - SCRIPT
   /api/v3/custom_script/{script_run_id}/files:
     get:
       operationId: script_file_api_v3_custom_script__script_run_id__files_get
       parameters:
-      - in: path
-        name: script_run_id
-        required: true
-        schema:
-          title: Script Run Id
-          type: string
+        - in: path
+          name: script_run_id
+          required: true
+          schema:
+            title: Script Run Id
+            type: string
       responses:
         '200':
           content:
@@ -1569,381 +148,7 @@ paths:
           description: Forbidden
       summary: Download the input, output, and log files of the custom script as tar.gz
       tags:
-      - SCRIPT
-  /api/v3/dp:
-    get:
-      operationId: dp_chill_api_v3_dp_get
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DpBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/DataProductObjectRespModel'
-                title: Response 200 Dp Chill Api V3 Dp Get
-                type: array
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Query data products meta data from CHILL database
-      tags:
-      - DATA_PRODUCT
-  /api/v3/eha/chill:
-    get:
-      description: Uses chill_get_chanvals and returns an array of EHA channel objects
-      operationId: eha_chill_api_v3_eha_chill_get
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EhaChillBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/ChannelValueObjectRespModel'
-                title: Response 200 Eha Chill Api V3 Eha Chill Get
-                type: array
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Queries channel values from CHILL database
-      tags:
-      - EHA
-  /api/v3/eha/chill_multi:
-    get:
-      description: Uses chill_get_chanvals and returns an array of EHA channel objects
-      operationId: eha_chill_multi_api_v3_eha_chill_multi_get
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EhaChillMultiBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/ChannelValueObjectRespModel'
-                title: Response 200 Eha Chill Multi Api V3 Eha Chill Multi Get
-                type: array
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Queries channel values from CHILL database. This supports querying
-        multiple channel ids, etc.
-      tags:
-      - EHA
-  /api/v3/eha/realtime:
-    get:
-      description: Queries AMPCS Global LAD and return an array of EHA channel objects
-      operationId: eha_realtime_api_v3_eha_realtime_get
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EhaRtBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/ChannelValueObjectRespModel'
-                title: Response 200 Eha Realtime Api V3 Eha Realtime Get
-                type: array
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Queries the real time telemetry stream for a given channel
-      tags:
-      - EHA
-  /api/v3/eha/realtime_multi:
-    get:
-      description: Queries AMPCS Global LAD and return an array of EHA channel objects
-      operationId: eha_realtime_multi_api_v3_eha_realtime_multi_get
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EhaRtMultiBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/ChannelValueObjectRespModel'
-                title: Response 200 Eha Realtime Multi Api V3 Eha Realtime Multi Get
-                type: array
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Queries the real time telemetry stream for a given channel. This supports
-        querying multiple channel ids, etc.
-      tags:
-      - EHA
-  /api/v3/evr/chill:
-    get:
-      description: Note that there is no guarantee that EVRs are sorted according
-        to the time.
-      operationId: evr_chill_api_v3_evr_chill_get
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EvrChillBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/EVRObjectResp'
-                title: Response 200 Evr Chill Api V3 Evr Chill Get
-                type: array
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Query EVRs using chill_get_evrs
-      tags:
-      - EVR
-  /api/v3/evr/chill_multi:
-    get:
-      description: Note that there is no guarantee that EVRs are sorted according
-        to the time.
-      operationId: evr_chill_multi_api_v3_evr_chill_multi_get
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EvrChillMultiBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/EVRObjectResp'
-                title: Response 200 Evr Chill Multi Api V3 Evr Chill Multi Get
-                type: array
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Query EVRs using chill_get_evrs. This supports querying multiple EVR
-        names, etc.
-      tags:
-      - EVR
-  /api/v3/evr/realtime:
-    get:
-      description: Queries the AMPCS Global LAD and return an array of EVR objects
-      operationId: evr_realtime_api_v3_evr_realtime_get
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EvrRtBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/EVRObjectResp'
-                title: Response 200 Evr Realtime Api V3 Evr Realtime Get
-                type: array
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Queries the real time EVR stream for the specified EVRs
-      tags:
-      - EVR
-  /api/v3/evr/realtime_multi:
-    get:
-      description: Queries the AMPCS Global LAD and return an array of EVR objects
-      operationId: evr_realtime_multi_api_v3_evr_realtime_multi_get
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EvrRtMultiBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/EVRObjectResp'
-                title: Response 200 Evr Realtime Multi Api V3 Evr Realtime Multi Get
-                type: array
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Queries the real time EVR stream for the specified EVRs. This supports
-        querying multiple EVR names, etc.
-      tags:
-      - EVR
+        - SCRIPT
   /api/v3/health:
     get:
       operationId: health_api_v3_health_get
@@ -1962,85 +167,200 @@ paths:
           description: Bad Request
       summary: Check health status of VenueServer
       tags:
-      - HEALTH
-  /api/v3/mtak/shutdown:
-    post:
-      operationId: shutdown_mtak_api_v3_mtak_shutdown_post
-      responses:
-        '204':
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Shutdown MTAK that was started by VenueServer
-      tags:
-      - MTAK
-  /api/v3/mtak/start:
-    post:
-      operationId: start_mtak_api_v3_mtak_start_post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MtakStartBodyModel'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MtakStartResponse'
-          description: Successful Response
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Bad Request
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Unauthorized
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Forbidden
-      summary: Start MTAK on the venue GDS host for the specified AMPCS session ids
-      tags:
-      - MTAK
+        - HEALTH
 tags:
-- description: Start or stop MTAK sessions
-  name: MTAK
-- description: Send commands
-  name: COMMAND
-- description: Query EVR telemetry
-  name: EVR
-- description: Query EHA telemetry
-  name: EHA
-- description: Query data products
-  name: DATA_PRODUCT
-- description: Query 1553 bus logs
-  name: BUS_1553
-- description: Run custom scripts
-  name: SCRIPT
-- description: Check service health
-  name: HEALTH
+  - description: Run custom scripts
+    name: SCRIPT
+  - description: Check service health
+    name: HEALTH        
+components:
+  schemas:
+    CustomScriptOutputs:
+      properties:
+        entries:
+          allOf:
+            - $ref: '#/components/schemas/ScriptEntriesModel'
+          default: {}
+          description: Custom script entries
+          title: Entries
+        output_array:
+          default: []
+          description: Custom script output array
+          items:
+            type: object
+          title: Output Array
+          type: array
+        outputs:
+          default: {}
+          description: Custom script outputs fields
+          title: Outputs
+          type: object
+      title: CustomScriptOutputs
+      type: object
+    CustomScriptStatus:
+      description: An enumeration.
+      enum:
+        - PENDING
+        - ERROR
+        - PASS
+        - FAIL
+      title: CustomScriptStatus
+      type: string
+    ErrorResponse:
+      properties:
+        message:
+          default: ''
+          description: Error message
+          title: Message
+          type: string
+      title: ErrorResponse
+      type: object
+    HealthStatus:
+      properties:
+        message:
+          description: status message
+          title: Message
+          type: string
+        status:
+          allOf:
+            - $ref: '#/components/schemas/HealthStatusEnum'
+          description: health status
+      required:
+        - status
+        - message
+      title: HealthStatus
+      type: object
+    HealthStatusEnum:
+      description: An enumeration.
+      enum:
+        - OK
+        - ERROR
+        - UNKNOWN
+      title: HealthStatusEnum
+      type: string
+    ScriptEntriesModel:
+      properties:
+        entry_output_array:
+          default: []
+          description: Custom script entry output array
+          items:
+            type: object
+          title: Entry Output Array
+          type: array
+        entry_outputs:
+          default: {}
+          description: Custom script entry outputs
+          title: Entry Outputs
+          type: object
+        verification_status:
+          allOf:
+            - $ref: '#/components/schemas/VerificationStatus'
+          default: PENDING
+          description: Verification status for the specified entry
+      title: ScriptEntriesModel
+      type: object
+    ScriptHaltBodyModel:
+      properties:
+        scriptRunId:
+          description: custom script ID for the running custom script
+          title: Scriptrunid
+          type: string
+      required:
+        - scriptRunId
+      title: ScriptHaltBodyModel
+      type: object
+    ScriptRunInfo:
+      properties:
+        scriptRunId:
+          description: id of the running script
+          title: Scriptrunid
+          type: string
+      required:
+        - scriptRunId
+      title: ScriptRunInfo
+      type: object
+    ScriptStartBodyModel:
+      properties:
+        inputs:
+          default: {}
+          description: Dictionary of custom script inputs and corresponding values
+          title: Inputs
+          type: object
+        outputs:
+          default: {}
+          description: Dictionary of custom script outputs
+          title: Outputs
+          type: object
+        scriptHash:
+          description: SHA256 hash of custom script file
+          title: Scripthash
+          type: string
+        scriptName:
+          description: Name of custom script
+          title: Scriptname
+          type: string
+        scriptPath:
+          description: Relative path of custom script from custom script root directory
+          title: Scriptpath
+          type: string
+      required:
+        - scriptName
+        - scriptPath
+        - scriptHash
+      title: ScriptStartBodyModel
+      type: object
+    ScriptStatusBodyModel:
+      properties:
+        scriptRunId:
+          description: custom script ID for the running custom script
+          title: Scriptrunid
+          type: string
+      required:
+      - scriptRunId
+      title: ScriptStatusBodyModel
+      type: object      
+    ScriptStatusResp:
+      properties:
+        custom_script_outputs:
+          allOf:
+            - $ref: '#/components/schemas/CustomScriptOutputs'
+          default: {}
+          description: >-
+            Object that contains all current output values from the executed
+            custom script
+          title: Custom Script Outputs
+        custom_script_status:
+          allOf:
+            - $ref: '#/components/schemas/CustomScriptStatus'
+          default: PENDING
+          description: The current status of the executed custom script
+        logfile_lines:
+          default: []
+          description: last 25 lines of the custom script log file
+          items:
+            type: string
+          title: Logfile Lines
+          type: array
+        logfile_path:
+          default: ''
+          description: The absolute path (on GDS host) to the custom script log file
+          title: Logfile Path
+          type: string
+        logfile_url:
+          default: ''
+          description: >-
+            Relative URL of download end point of logs.
+            "custom_script/{script_run_id}/files"
+          title: Logfile Url
+          type: string
+      title: ScriptStatusResp
+      type: object
+    VerificationStatus:
+      description: An enumeration.
+      enum:
+        - PENDING
+        - ERROR
+        - PASS
+        - FAIL
+      title: VerificationStatus
+      type: string          

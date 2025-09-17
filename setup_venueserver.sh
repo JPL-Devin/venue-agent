@@ -49,13 +49,6 @@ else
   exit 1
 fi
 
-
-if [[ -z "$ING_MTAK_DIR" ]] 
-then
-  echo "Error: ING_MTAK_DIR env variable is not defined"  
-  exit 1
-fi
-
 if [[ -d "$VENV_DIR" ]] 
 then
     echo "Use existing Python virtual env: $VENV_DIR"
@@ -64,14 +57,7 @@ else
     virtualenv -p python3 $VENV_DIR
 fi
 
-AMPCS_REQUIREMENTS="$ING_MTAK_DIR/ampcs_requirements.txt"
 REQUIREMENTS="$SCRIPT_DIR/requirements.txt"
-
-if [[ ! -f "$AMPCS_REQUIREMENTS" ]] 
-then
-  echo "Error: $AMPCS_REQUIREMENTS file not found"  
-  exit 1
-fi
 
 if [[ ! -f "$REQUIREMENTS" ]] 
 then
@@ -79,11 +65,8 @@ then
   exit 1
 fi
 
-
 source $VENV_DIR/bin/activate
 pip install -U pip
-echo "Installing AMPCS Python dependencies from $AMPCS_REQUIREMENTS"
-pip install -r "$AMPCS_REQUIREMENTS"
 echo "Installing Python dependencies from $REQUIREMENTS"
 pip install -r "$REQUIREMENTS"
 # uvicorn requires click version 7 or later

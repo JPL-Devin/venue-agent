@@ -16,41 +16,10 @@ from .config import SCLKSCET_LOOKBACK
 import subprocess
 from io import StringIO
 
-command_type_mapping = {
-  "0": "HW_COMMAND",
-  "1": "FSW_COMMAND",
-  "2": "BINARY_FILE" 
-}
 
 ###########################################################
 ###### MAPPINGS BETWEEN JSON INPUTS AND CHILL INPUTS ######
 ###########################################################
-
-
-
-class EVRType (Enum):
-  FSW_REALTIME = "f"
-  FSW_RECORDED = "r"
-  SSE = "s"
-
-
-class ChannelType (Enum):
-  # only noting 3 of 6 possibilities
-  FSW_REALTIME = "f"
-  FSW_RECORDED = "r"
-  SSE = "s"
-
-
-class AlarmTypeMap (Enum):
-  RED_ALARM = "RED"
-  YELLOW_ALARM = "YELLOW"
-  ANY_ALARM = "ANY"
-
-
-class DpStatus (Enum):
-  ALL = "" # dummy value - not really useful
-  COMPLETE = "--completeOnly"
-  PARTIAL = "--partialOnly"
 
 
 class VenueType (Enum):
