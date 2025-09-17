@@ -1,0 +1,10 @@
+fastapi==0.83.0
+uvicorn==0.16.0
+pyaml-env==1.2.1
+pyjwt==1.6.1
+redis==2.10.6
+tailer==0.4.1
+bitstring==3.1.5
+psutil==5.9.4
+file-read-backwards==2.0.0
+#

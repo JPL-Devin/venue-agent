@@ -1,0 +1,32 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  timestamped:
+    datefmt: "%Y-%m-%dT%H:%M:%S"
+    format: '[%(asctime)s.%(msecs)03dZ] %(name)s %(levelname)s %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: timestamped
+    stream: ext://sys.stdout
+  rotating_file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: timestamped
+    maxBytes: 50000000
+    backupCount: 20
+    # env variable is used through pyaml-env package
+    filename: !ENV '${ING_LOG_DIR}/ing_vs.log'
+root:
+  level: DEBUG
+  handlers: 
+    - console
+    - rotating_file
+loggers:
+  uvicorn.error:
+    level: DEBUG
+    propagate: yes
+  uvicorn.access:
+    level: DEBUG
+    propagate: yes
