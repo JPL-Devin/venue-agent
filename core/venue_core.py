@@ -1,13 +1,9 @@
 # import mtak first since this messes up logging
-from typing import List, Dict
-
 import logging
 logger = logging.getLogger(__name__)
 
 import os
-import sys
 import stat
-import re
 import redis
 import tailer
 import json
@@ -16,19 +12,11 @@ import psutil
 import signal
 import uuid
 import tarfile
-import bitstring
 import glob
 from datetime import datetime
 import subprocess
 
-import traceback
-import time
-from .core_utils import str2bool, EVRType, ChannelType, AlarmTypeMap, DpStatus, get_env, \
-  get_now_isoZ, doyToIsoZ, normalize_with_microsecs, get_csv_row_reader, \
-  return_validated_start_end_times, doys_for_lookback, TimeParsingError, \
-  most_recent_datetime, utc_now_doy, validate_time, command_type_mapping
-from .schema import TimeType
-
+from .core_utils import get_env
 
 CUSTOM_SCRIPT_LOG_PATH_BASE='/tmp/cs'
 
