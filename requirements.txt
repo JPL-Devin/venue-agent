@@ -8,4 +8,5 @@ bitstring==4.3.1
 psutil==7.1.0
 file-read-backwards==3.2.0
 cryptography==46.0.1
+click==8.3.0
 #
