@@ -54,7 +54,7 @@ then
     echo "Use existing Python virtual env: $VENV_DIR"
 else
     echo "Creating a Python virtual env: $VENV_DIR"
-    virtualenv -p python3 $VENV_DIR
+    virtualenv -p python3.12 $VENV_DIR
 fi
 
 REQUIREMENTS="$SCRIPT_DIR/requirements.txt"
@@ -66,11 +66,9 @@ then
 fi
 
 source $VENV_DIR/bin/activate
-pip install -U pip
+python -m pip install -U pip
 echo "Installing Python dependencies from $REQUIREMENTS"
-pip install -r "$REQUIREMENTS"
-# uvicorn requires click version 7 or later
-pip install --ignore-installed "click>=7.0.0"
+python -m pip install -r "$REQUIREMENTS"
 
 #
 # Generate nginx configuration file
