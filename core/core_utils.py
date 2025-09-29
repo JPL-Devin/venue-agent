@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 import os
 import traceback
 from datetime import datetime, timezone
-import re
 import socket
 import glob
 from .config import SCLKSCET_LOOKBACK
