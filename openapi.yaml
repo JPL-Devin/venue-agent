@@ -77,7 +77,7 @@ paths:
       summary: Start execution of a custom script
       tags:
         - SCRIPT
-  /api/v3/custom_script/status::
+  /api/v3/custom_script/status:
     get:
       operationId: script_status_api_v3_custom_script_status_get
       requestBody:
