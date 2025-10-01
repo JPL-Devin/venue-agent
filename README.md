@@ -12,17 +12,12 @@ Run the following script to set up a Python virtual environment as `venv3`.
 The script will also generate an NGINX configuration file (`nginx.conf`) from a template (`nginx.conf.template`). 
 You do not need to run nginx for local development.
 
-The set up script takes a file (e.g., `config/europa_dev_envs.sh`) that contains a few environment variables. You will need to update
+The set up script takes a file (e.g., `config/project_dev_envs.sh`) that contains a few environment variables. You will need to update
 the environment variables according to your environment.
 
-On a Europa WSTS:
+For example:
 ```
-$ ./setup_venueserver.sh -f config/europa_dev_envs.sh
-```
-
-On a Psyche WSTS:
-```
-$ ./setup_venueserver.sh -f config/psyche_dev_envs.sh
+$ ./setup_venueserver.sh -f config/project_dev_envs.sh
 ```
 
 ### REDIS
@@ -180,7 +175,7 @@ If multiple instances of VenueServer are running for a Venue, set up multiple sy
 
 NGINX does not have a native way to rotate logs.
 
-This needs to be done through `logrotate` that can be set by GDS teams.
+This needs to be done through `logrotate` that can be set by Sys Admins of the client server.
 
 See this [article](https://www.digitalocean.com/community/tutorials/how-to-configure-logging-and-log-rotation-in-nginx-on-an-ubuntu-vps#log-rotation-with-logrotate)
  
