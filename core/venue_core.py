@@ -259,6 +259,9 @@ def construct_script_outputs(output_json):
 
       structure['entries'].append(entry_structure)
 
+    if output_json.get('output_summary'):
+        structure['output_summary'] = output_json['output_summary']
+
   return structure
 
 

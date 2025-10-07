@@ -51,6 +51,7 @@ class CustomScriptOutputs(BaseModel):
     outputs: dict = Field({}, description='Custom script outputs fields')
     output_array: List[dict] = Field([], description='Custom script output array')
     entries: ScriptEntriesModel = Field({}, description='Custom script entries')
+    output_summary: str = Field('', description='human readable summary of output')
 
 class ScriptStatusResp(BaseModel):
     logfile_url: str = Field('', description='Relative URL of download end point of logs. "custom_script/{script_run_id}/files"')
