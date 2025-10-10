@@ -118,7 +118,7 @@ def script_start(body: ScriptStartBodyModel, request: Request, response: Respons
         return ErrorResponse(message=f'{msg}. {traceback.format_exc()}')
 
 
-@prefix_router.get('/custom_script/status',
+@prefix_router.get('/custom_script/{script_run_id}',
                     responses={
                         200: {'model': ScriptStatusResp},
                         400: {'model': ErrorResponse},
@@ -128,19 +128,19 @@ def script_start(body: ScriptStartBodyModel, request: Request, response: Respons
                     summary='Retrieve status information from currently executing script',
                     tags=['SCRIPT']
                 )
-def script_status(body: ScriptStatusBodyModel, response: Response):
+def script_status(script_run_id: str, response: Response):
     try:
-        res_dict = venue_core.get_custom_script_status(script_run_id=body.scriptRunId)
+        res_dict = venue_core.get_custom_script_status(script_run_id=script_run_id)
         return JSONResponse(status_code=200, content=res_dict)
 
     except Exception as e:
-        msg = f'Failed to get the status of custom script: {body.scriptRunId}'
+        msg = f'Failed to get the status of custom script: {script_run_id}'
         logging.exception(msg)
         response.status_code = 400
         return ErrorResponse(message=f'{msg}. {traceback.format_exc()}')
 
 
-@prefix_router.post('/custom_script/halt',
+@prefix_router.post('/custom_script/{script_run_id}/halt',
                     status_code=204,
                     responses={
                         400: {'model': ErrorResponse},
@@ -150,13 +150,13 @@ def script_status(body: ScriptStatusBodyModel, response: Response):
                     summary='Halt custom script specified',
                     tags=['SCRIPT']    
                 )
-def script_halt(body: ScriptHaltBodyModel, response: Response):
+def script_halt(script_run_id, response: Response):
     try:
-        venue_core.halt_custom_script(script_run_id=body.scriptRunId)
+        venue_core.halt_custom_script(script_run_id=script_run_id)
         return Response(status_code=204)
     
     except Exception as e:
-        msg = f'Failed to halt custom script: {body.scriptRunId}'
+        msg = f'Failed to halt custom script: {script_run_id}'
         logging.exception(msg)
         response.status_code = 400
         return ErrorResponse(message=f'{msg}. {traceback.format_exc()}')
