@@ -1,0 +1,137 @@
+import tests._jwt_env
+import os
+import time
+import subprocess
+from pathlib import Path
+import datetime
+import logging
+
+
+import pytest
+import requests
+import jwt  # PyJWT – add to requirements if not already present
+from fastapi.testclient import TestClient
+
+# ----------------------------------------------------------------------
+# Import the FastAPI app **after** the environment is prepared.
+# ----------------------------------------------------------------------
+from main import app
+
+# ----------------------------------------------------------------------
+# NEW: configure application logging to a temporary file
+# ----------------------------------------------------------------------
+"""
+@pytest.fixture(scope="session", autouse=True)
+def configure_app_logging(tmp_path_factory):
+    
+    Create a temporary log file and attach it to the root logger.
+    The file lives in a pytest‑managed tmp directory (cleaned up after the
+    session) and receives all log records emitted by the application.
+    
+    # 1️⃣ Create a temp directory for logs and a log file inside it.
+    log_dir = tmp_path_factory.mktemp("logs")
+    log_file = log_dir / "app.log"
+
+    # 2️⃣ Set up a file handler on the **root** logger (captures any logger used
+    #    in ``main.py`` unless a more specific logger name is known).
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)   # capture everything; adjust as needed
+
+    # Avoid adding duplicate handlers if pytest re‑executes the fixture.
+    if not any(
+        isinstance(h, logging.FileHandler) and getattr(h, "baseFilename", None) == str(log_file)
+        for h in root_logger.handlers
+    ):
+        file_handler = logging.FileHandler(log_file, mode="w")
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
+        file_handler.setFormatter(formatter)
+        root_logger.addHandler(file_handler)
+
+    # 3️⃣ Return the Path so tests can optionally inspect the log.
+    return log_file
+
+"""
+@pytest.fixture(scope="function", autouse=True)
+def per_test_logging(request, tmp_path):
+    """
+    Create a temporary log file for the *current* test case and attach a
+    ``FileHandler`` to the root logger (or the specific logger used by the
+    application). The handler is removed after the test finishes.
+
+    The fixture yields the :class:`pathlib.Path` of the log file so a test can
+    read it if desired, but it also runs automatically for every test because
+    ``autouse=True``.
+    """
+    # ------------------------------------------------------------------
+    # 1️⃣ Build a safe filename from the test's nodeid.
+    # ------------------------------------------------------------------
+    # ``nodeid`` looks like "tests/test_custom_script.py::test_start_custom_script_success"
+    # Replace characters that are illegal in filenames.
+    safe_name = request.node.nodeid.replace("/", "_").replace("::", "__")
+    safe_name = safe_name.replace("[", "_").replace("]", "_")
+    log_file = tmp_path / f"{safe_name}.log"
+
+    # ------------------------------------------------------------------
+    # 2️⃣ Set up a file handler on the logger used by the app.
+    # ------------------------------------------------------------------
+    # If your application uses a dedicated logger (e.g., `logging.getLogger("venue_server")`),
+    # replace `logging.getLogger()` with that name.
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)   # capture everything; adjust as needed
+
+    file_handler = logging.FileHandler(log_file, mode="w")
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+    # ------------------------------------------------------------------
+    # 3️⃣ Yield the path for optional test‑side inspection.
+    # ------------------------------------------------------------------
+    yield log_file
+
+
+@pytest.fixture(scope="session")
+def jwt_token():
+    """
+    Returns a JWT signed with the *private* RSA key.  The server validates it
+    with the public key that was placed in ``JWT_SECRET`` above.
+    """
+    # The private key is read from the file set in ``JWT_PRIVATE_KEY``.
+    private_key_path = os.getenv("JWT_PRIVATE_KEY")
+    assert private_key_path, "JWT_PRIVATE_KEY env var not set"
+    private_key = Path(private_key_path).read_text()
+    algorithm = os.getenv("JWT_ALGORITHM", "RS256")
+    audience  = os.getenv("JWT_AUDIENCE", "venue_api")
+
+    now_ts = int(datetime.datetime.utcnow().timestamp())
+    payload = {
+        "sub": "test_user",            # subject – can be any identifier
+        "iat": now_ts,                    # issued‑at
+        "exp": now_ts + 3600,  # expires in 1 hour
+        "iss": "test_suite",
+        "scopes": [{"scope": "execute:testbed"}]
+    }
+
+    token = jwt.encode(payload, private_key, algorithm=algorithm)
+
+    # PyJWT 2.x returns ``str``; older versions return ``bytes``.
+    if isinstance(token, bytes):
+        token = token.decode("utf-8")
+    return token
+
+@pytest.fixture(scope="module")
+def auth_client(jwt_token):
+    """
+    Returns a TestClient that runs the FastAPI app locally and includes the
+    Bearer token in the `Authorization` header for every request.
+    """
+    with TestClient(app) as c:
+        # Set default headers for the client instance.
+        c.headers.update({"Authorization": f"Bearer {jwt_token}"})
+        yield c
+
+
