@@ -43,7 +43,7 @@ def test_start_custom_script_success(auth_client: TestClient):
         "scriptPath": "custom_script_for_tests/test_cs.py",
         "scriptHash": _sha256(script_path),
         "inputs": inputs,    # No inputs needed for this script.
-        "outputs": {}    # No predefined outputs.
+        "outputs": {"custom_script_status": "PENDING"}
     }
 
     response = auth_client.post("/api/v3/custom_script/start", json=payload)
@@ -71,7 +71,7 @@ def test_status_custom_script_pass_30(auth_client: TestClient):
         "scriptPath": "custom_script_for_tests/test_cs.py",
         "scriptHash": _sha256(script_path),
         "inputs": inputs,    # No inputs needed for this script.
-        "outputs": {}    # No predefined outputs.
+        "outputs": {"custom_script_status": "PENDING"}
     }
 
     response = auth_client.post("/api/v3/custom_script/start", json=payload)
@@ -81,8 +81,6 @@ def test_status_custom_script_pass_30(auth_client: TestClient):
     )
     data = response.json()
     assert "scriptRunId" in data, "Response JSON missing 'scriptRunId'"
-
-    time.sleep(1)
 
     script_run_id = data["scriptRunId"]
 
@@ -119,7 +117,7 @@ def test_status_custom_script_halt_30(auth_client: TestClient):
         "scriptPath": "custom_script_for_tests/test_cs.py",
         "scriptHash": _sha256(script_path),
         "inputs": inputs,    # No inputs needed for this script.
-        "outputs": {}    # No predefined outputs.
+        "outputs": {"custom_script_status": "PENDING"}
     }
 
     response = auth_client.post("/api/v3/custom_script/start", json=payload)
@@ -173,7 +171,7 @@ def test_status_custom_script_halt_completed_script(auth_client: TestClient):
         "scriptPath": "custom_script_for_tests/test_cs.py",
         "scriptHash": _sha256(script_path),
         "inputs": inputs,    # No inputs needed for this script.
-        "outputs": {}    # No predefined outputs.
+        "outputs": {"custom_script_status": "PENDING"}
     }
 
     response = auth_client.post("/api/v3/custom_script/start", json=payload)
@@ -183,8 +181,6 @@ def test_status_custom_script_halt_completed_script(auth_client: TestClient):
     )
     data = response.json()
     assert "scriptRunId" in data, "Response JSON missing 'scriptRunId'"
-
-    time.sleep(1)
 
     script_run_id = data["scriptRunId"]
 
@@ -208,7 +204,6 @@ def test_status_custom_script_halt_completed_script(auth_client: TestClient):
     assert response.status_code == 204, (
         f"Unexpected status {response.status_code}: {response.text}"
     )
-
 
 @pytest.mark.timeout(30)
 def test_halt_custom_script_invalid_id(auth_client: TestClient):
@@ -244,7 +239,7 @@ def test_custom_script_large_response(auth_client: TestClient):
         "scriptPath": "custom_script_for_tests/test_cs.py",
         "scriptHash": _sha256(script_path),
         "inputs": inputs,    # No inputs needed for this script.
-        "outputs": {}    # No predefined outputs.
+        "outputs": {"custom_script_status": "PENDING"}
     }
 
     response = auth_client.post("/api/v3/custom_script/start", json=payload)
@@ -275,6 +270,105 @@ def test_custom_script_large_response(auth_client: TestClient):
     assert script_status == "PASS", (f"Unexpected script completion status {script_status}")
 
 
+@pytest.mark.timeout(45)
+def test_custom_script_files(auth_client: TestClient):
+    """
+    Verify that the `/api/v3/custom_script/` endpoint works when a
+    correctly‑signed JWT is supplied (the `client` fixture adds the header).
+    """
+    script_path = Path(__file__).parent / "custom_script_for_tests" / "test_cs.py"
+    assert script_path.is_file(), f"Script not found: {script_path}"
+
+    inputs = {'inputs': {'duration': 30,
+                         'script_result': 'PASS',
+                         "output_random_data": 1000000}}
+
+    payload = {
+        "scriptName": "test_cs",
+        "scriptPath": "custom_script_for_tests/test_cs.py",
+        "scriptHash": _sha256(script_path),
+        "inputs": inputs,    # No inputs needed for this script.
+        "outputs": {"custom_script_status": "PENDING"}
+    }
+
+    response = auth_client.post("/api/v3/custom_script/start", json=payload)
+
+    assert response.status_code == 200, (
+        f"Unexpected status {response.status_code}: {response.text}"
+    )
+    data = response.json()
+    assert "scriptRunId" in data, "Response JSON missing 'scriptRunId'"
+
+    script_run_id = data["scriptRunId"]
+
+    script_status = ""
+
+    while script_status != "PASS":
+        response = auth_client.get(f"/api/v3/custom_script/{script_run_id}")
+
+        assert response.status_code == 200, (
+            f"Unexpected status {response.status_code}: {response.text}"
+        )
+        data = response.json()
+
+        script_status = data["custom_script_status"]
+        time.sleep(1)
+
+    assert script_status == "PASS", (f"Unexpected script completion status {script_status}")
+
+    response = auth_client.get(f"/api/v3/custom_script/{script_run_id}/files")
+
+    assert response.status_code == 200, (
+        f"Unexpected status {response.status_code}: {response.text}")
+
+@pytest.mark.timeout(100)
+def test_custom_script_heavy_writes_no_wait(auth_client: TestClient):
+    """
+    Verify that the `/api/v3/custom_script/` endpoint works when a
+    correctly‑signed JWT is supplied (the `client` fixture adds the header).
+    """
+    script_path = Path(__file__).parent / "custom_script_for_tests" / "test_cs.py"
+    assert script_path.is_file(), f"Script not found: {script_path}"
+
+    inputs = {'inputs': {'duration': 90,
+                         'script_result': 'PASS',
+                         'heavy_writes' : 'true',
+                         "output_random_data": 1000000}}
+
+    payload = {
+        "scriptName": "test_cs",
+        "scriptPath": "custom_script_for_tests/test_cs.py",
+        "scriptHash": _sha256(script_path),
+        "inputs": inputs,    # No inputs needed for this script.
+        "outputs": {"custom_script_status": "PENDING"}    # No predefined outputs.
+    }
+
+
+    response = auth_client.post("/api/v3/custom_script/start", json=payload)
+
+    assert response.status_code == 200, (
+        f"Unexpected status {response.status_code}: {response.text}"
+    )
+    data = response.json()
+    assert "scriptRunId" in data, "Response JSON missing 'scriptRunId'"
+
+    script_run_id = data["scriptRunId"]
+
+    script_status = ""
+
+    while script_status != "PASS":
+        response = auth_client.get(f"/api/v3/custom_script/{script_run_id}")
+
+        assert response.status_code == 200, (
+            f"Unexpected status {response.status_code}: {response.text}"
+        )
+        data = response.json()
+
+        script_status = data["custom_script_status"]
+
+        time.sleep(0.5)
+
+    assert script_status == "PASS", (f"Unexpected script completion status {script_status}")
 
 # ----------------------------------------------------------------------
 # Test: start a custom script without any JWT (should be rejected).
