@@ -15,6 +15,7 @@ import tarfile
 import glob
 from datetime import datetime
 import subprocess
+import time
 
 from .core_utils import get_env
 
@@ -22,6 +23,24 @@ CUSTOM_SCRIPT_LOG_PATH_BASE='/tmp/cs'
 
 _custom_script_base_dir = get_env('CUSTOM_SCRIPT_BASE_DIR')
 
+def _load_json_with_retry(path: str, max_attempts: int=5, delay: float = 0.1):
+  """
+  This function will retry 
+  
+  """
+
+  attempt = 0
+  while attempt < max_attempts:
+    try:
+      with open(path, 'r') as file:
+        data = json.load(file)
+        return data
+    except json.JSONDecodeError as er:
+      msg = f"JSON decode failed on attempt {attempt+1}/{max_attempts} for {path}: {er} - retrying"
+      logger.debug(msg)
+    attempt+=1
+    time.sleep(delay * (2*attempt))
+  raise RuntimeError(f"unable to read a consistent JSON file from {path}")
 
 def get_current_datetime_stamp():
 
@@ -211,7 +230,7 @@ def start_custom_script(script_hash, script_path, inputs, outputs):
   else:
     msg = "File hash matches generated file hash"
     logger.debug(msg)
-  
+
   try:
     script_run_id = launch_script(joined_path, inputs, outputs)
   except Exception as ex:
@@ -325,14 +344,12 @@ def get_custom_script_status(script_run_id):
     else:
       pid_is_alive = True    
 
-  # extract outputs from outputs dir
-  with open(output_dir, 'r') as f:
-    try:
-      output_json = json.load(f)
-    except Exception as ex:
-      msg = f'Error when parsing the script output file. Error: {ex}'
-      logger.error(msg)
-      raise Exception(msg)
+  try:
+    output_json = _load_json_with_retry(output_dir, 10, 0.1)
+  except Exception as ex:
+    msg = f'Error when parsing the script output file. Error: {ex}'
+    logger.error(msg)
+    raise Exception(msg)
 
   logger.debug(f'Output file content: {output_json}')
 
