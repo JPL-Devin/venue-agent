@@ -267,7 +267,7 @@ def test_custom_script_large_response(auth_client: TestClient):
         script_status = data["custom_script_status"]
         time.sleep(1)
 
-    assert script_status == "PASS", (f"Unexpected script completion status {script_status}")
+    assert script_status == "PASS", f"Unexpected script completion status {script_status}"
 
 
 @pytest.mark.timeout(45)
@@ -318,8 +318,7 @@ def test_custom_script_files(auth_client: TestClient):
 
     files = auth_client.get(f"/api/v3/custom_script/{script_run_id}/files")
 
-    assert files.status_code == 200, (
-        f"Unexpected status {files.status_code}: {files.text}")
+    assert files.status_code == 200, f"Unexpected status {files.status_code}: {files.text}"
 
 @pytest.mark.timeout(100)
 def test_custom_script_heavy_writes_no_wait(auth_client: TestClient):
