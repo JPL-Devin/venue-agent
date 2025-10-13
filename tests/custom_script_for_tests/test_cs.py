@@ -127,6 +127,7 @@ if __name__ == '__main__':
                 write_dur.append(write_duration)
                 outputs['write_avg_duration'] = statistics.mean(write_dur)
                 outputs['write_max_time'] = max(write_dur)
+                time.sleep(0.1)
 
 
     msg = f'test_cs.py has run to completion with overall status: {custom_script_status}'
