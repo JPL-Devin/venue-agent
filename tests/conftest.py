@@ -20,39 +20,6 @@ from main import app
 # ----------------------------------------------------------------------
 # NEW: configure application logging to a temporary file
 # ----------------------------------------------------------------------
-"""
-@pytest.fixture(scope="session", autouse=True)
-def configure_app_logging(tmp_path_factory):
-    
-    Create a temporary log file and attach it to the root logger.
-    The file lives in a pytest‑managed tmp directory (cleaned up after the
-    session) and receives all log records emitted by the application.
-    
-    # 1️⃣ Create a temp directory for logs and a log file inside it.
-    log_dir = tmp_path_factory.mktemp("logs")
-    log_file = log_dir / "app.log"
-
-    # 2️⃣ Set up a file handler on the **root** logger (captures any logger used
-    #    in ``main.py`` unless a more specific logger name is known).
-    root_logger = logging.getLogger()
-    root_logger.setLevel(logging.DEBUG)   # capture everything; adjust as needed
-
-    # Avoid adding duplicate handlers if pytest re‑executes the fixture.
-    if not any(
-        isinstance(h, logging.FileHandler) and getattr(h, "baseFilename", None) == str(log_file)
-        for h in root_logger.handlers
-    ):
-        file_handler = logging.FileHandler(log_file, mode="w")
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
-        file_handler.setFormatter(formatter)
-        root_logger.addHandler(file_handler)
-
-    # 3️⃣ Return the Path so tests can optionally inspect the log.
-    return log_file
-
-"""
 @pytest.fixture(scope="function", autouse=True)
 def per_test_logging(request, tmp_path):
     """
@@ -79,7 +46,7 @@ def per_test_logging(request, tmp_path):
     # If your application uses a dedicated logger (e.g., `logging.getLogger("venue_server")`),
     # replace `logging.getLogger()` with that name.
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)   # capture everything; adjust as needed
+    logger.setLevel(logging.INFO)   # capture everything; adjust as needed
 
     file_handler = logging.FileHandler(log_file, mode="w")
     formatter = logging.Formatter(
