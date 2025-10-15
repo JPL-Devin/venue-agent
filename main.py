@@ -163,7 +163,6 @@ def script_halt(script_run_id, response: Response):
 
 
 @prefix_router.get('/custom_script/{script_run_id}/files',
-                    response_class=FileResponse,
                     responses={
                         200: {'content': {'application/gzip': {}}},
                         400: {'model': ErrorResponse},
