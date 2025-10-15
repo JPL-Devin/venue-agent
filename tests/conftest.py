@@ -72,13 +72,70 @@ def jwt_token():
     assert private_key_path, "JWT_PRIVATE_KEY env var not set"
     private_key = Path(private_key_path).read_text()
     algorithm = os.getenv("JWT_ALGORITHM", "RS256")
-    audience  = os.getenv("JWT_AUDIENCE", "venue_api")
 
     now_ts = int(datetime.datetime.utcnow().timestamp())
     payload = {
         "sub": "test_user",            # subject – can be any identifier
         "iat": now_ts,                    # issued‑at
         "exp": now_ts + 3600,  # expires in 1 hour
+        "iss": "test_suite",
+        "scopes": [{"scope": "execute:testbed"}]
+    }
+
+    token = jwt.encode(payload, private_key, algorithm=algorithm)
+
+    # PyJWT 2.x returns ``str``; older versions return ``bytes``.
+    if isinstance(token, bytes):
+        token = token.decode("utf-8")
+    return token
+
+
+@pytest.fixture(scope="session")
+def expired_jwt_token():
+    """
+    Returns a JWT signed with the *private* RSA key.  The server validates it
+    with the public key that was placed in ``JWT_SECRET`` above.
+    """
+    # The private key is read from the file set in ``JWT_PRIVATE_KEY``.
+    private_key_path = os.getenv("JWT_PRIVATE_KEY")
+    assert private_key_path, "JWT_PRIVATE_KEY env var not set"
+    private_key = Path(private_key_path).read_text()
+    algorithm = os.getenv("JWT_ALGORITHM", "RS256")
+
+    now_ts = int(datetime.datetime.utcnow().timestamp())
+    payload = {
+        "sub": "test_user",            # subject – can be any identifier
+        "iat": now_ts,                    # issued‑at
+        "exp": now_ts + 3600,  # expires in 1 hour
+        "iss": "test_suite",
+        "scopes": [{}]
+    }
+
+    token = jwt.encode(payload, private_key, algorithm=algorithm)
+
+    # PyJWT 2.x returns ``str``; older versions return ``bytes``.
+    if isinstance(token, bytes):
+        token = token.decode("utf-8")
+    return token
+
+
+@pytest.fixture(scope="session")
+def no_scope_jwt_token():
+    """
+    Returns a JWT signed with the *private* RSA key.  The server validates it
+    with the public key that was placed in ``JWT_SECRET`` above.
+    """
+    # The private key is read from the file set in ``JWT_PRIVATE_KEY``.
+    private_key_path = os.getenv("JWT_PRIVATE_KEY")
+    assert private_key_path, "JWT_PRIVATE_KEY env var not set"
+    private_key = Path(private_key_path).read_text()
+    algorithm = os.getenv("JWT_ALGORITHM", "RS256")
+
+    now_ts = int(datetime.datetime.utcnow().timestamp())
+    payload = {
+        "sub": "test_user",            # subject – can be any identifier
+        "iat": now_ts - 7200,          # issued 2 h ago
+        "exp": now_ts - 3600,          # expired 1 h ago
         "iss": "test_suite",
         "scopes": [{"scope": "execute:testbed"}]
     }
