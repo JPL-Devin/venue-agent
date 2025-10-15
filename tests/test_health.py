@@ -23,3 +23,8 @@ def test_health_invalid_method_patch():
     """Off‑nominal: POST is not allowed on the health endpoint (expects 405)."""
     resp = client_no_auth.patch("/api/v3/health")
     assert resp.status_code == 405, f"Expected 405, got {resp.status_code}"
+
+def test_health_invalid_method_delete():
+    """Off‑nominal: POST is not allowed on the health endpoint (expects 405)."""
+    resp = client_no_auth.delete("/api/v3/health")
+    assert resp.status_code == 405, f"Expected 405, got {resp.status_code}"
