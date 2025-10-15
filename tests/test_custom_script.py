@@ -320,6 +320,20 @@ def test_custom_script_files(auth_client: TestClient):
 
     assert files.status_code == 200, f"Unexpected status {files.status_code}: {files.text}"
 
+
+@pytest.mark.timeout(45)
+def test_custom_script_files_off_nom(auth_client: TestClient):
+    """
+    Verify that the `/api/v3/custom_script/` endpoint works when a
+    correctly‑signed JWT is supplied (the `client` fixture adds the header).
+    """
+
+    script_run_id = "NOT FOUND"
+    files = auth_client.get(f"/api/v3/custom_script/{script_run_id}/files")
+
+    assert files.status_code == 400, f"Unexpected status {files.status_code}: {files.text}"
+
+
 @pytest.mark.timeout(100)
 def test_custom_script_heavy_writes_no_wait(auth_client: TestClient):
     """
@@ -369,9 +383,7 @@ def test_custom_script_heavy_writes_no_wait(auth_client: TestClient):
 
     assert script_status == "PASS", (f"Unexpected script completion status {script_status}")
 
-# ----------------------------------------------------------------------
-# Test: start a custom script without any JWT (should be rejected).
-# ----------------------------------------------------------------------
+
 def test_start_custom_script_unauthenticated():
     """
     Ensure the API returns **401 Unauthorized** when the request lacks a JWT.
