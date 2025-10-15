@@ -24,9 +24,7 @@ def _sha256(file_path: Path) -> str:
     hasher.update(file_path.read_bytes())
     return hasher.hexdigest()
 
-# ----------------------------------------------------------------------
-# Test: start a custom script with a valid JWT (authenticated request).
-# ----------------------------------------------------------------------
+
 def test_start_custom_script_success(auth_client: TestClient):
     """
     Verify that the `/api/v3/custom_script/start` endpoint works when a
@@ -54,8 +52,9 @@ def test_start_custom_script_success(auth_client: TestClient):
     data = response.json()
     assert "scriptRunId" in data, "Response JSON missing 'scriptRunId'"
 
+
 @pytest.mark.timeout(35)
-def test_status_custom_script_pass_30(auth_client: TestClient):
+def test_status_custom_script_pass(auth_client: TestClient):
     """
     Verify that the `/api/v3/custom_script/` endpoint works when a
     correctly‑signed JWT is supplied (the `client` fixture adds the header).
@@ -101,7 +100,7 @@ def test_status_custom_script_pass_30(auth_client: TestClient):
 
 
 @pytest.mark.timeout(60)
-def test_status_custom_script_halt_30(auth_client: TestClient):
+def test_status_custom_script_halt(auth_client: TestClient):
     """
     Verify that the `/api/v3/custom_script/` endpoint works when a
     correctly‑signed JWT is supplied (the `client` fixture adds the header).
@@ -204,6 +203,7 @@ def test_status_custom_script_halt_completed_script(auth_client: TestClient):
     assert response.status_code == 204, (
         f"Unexpected status {response.status_code}: {response.text}"
     )
+
 
 @pytest.mark.timeout(30)
 def test_halt_custom_script_invalid_id(auth_client: TestClient):
@@ -322,7 +322,7 @@ def test_custom_script_files(auth_client: TestClient):
 
 
 @pytest.mark.timeout(45)
-def test_custom_script_files_off_nom(auth_client: TestClient):
+def test_custom_script_files_bad_id(auth_client: TestClient):
     """
     Verify that the `/api/v3/custom_script/` endpoint works when a
     correctly‑signed JWT is supplied (the `client` fixture adds the header).
@@ -384,29 +384,55 @@ def test_custom_script_heavy_writes_no_wait(auth_client: TestClient):
     assert script_status == "PASS", (f"Unexpected script completion status {script_status}")
 
 
-def test_start_custom_script_unauthenticated():
+def test_start_custom_script_expired(auth_client: TestClient, expired_jwt_token):
     """
-    Ensure the API returns **401 Unauthorized** when the request lacks a JWT.
-    This uses a fresh `TestClient` without the auth header that the `client`
-    fixture injects.
+    Verify that the `/api/v3/custom_script/start` endpoint works when a
+    correctly‑signed JWT is supplied (the `client` fixture adds the header).
     """
-    # Fresh client – no Authorization header.
-    client_no_auth = TestClient(app)
-
     script_path = Path(__file__).parent / "custom_script_for_tests" / "test_cs.py"
     assert script_path.is_file(), f"Script not found: {script_path}"
+
+    inputs = {'inputs': {'duration': 30,
+                         'script_result': 'PASS'}}
 
     payload = {
         "scriptName": "test_cs",
         "scriptPath": "custom_script_for_tests/test_cs.py",
         "scriptHash": _sha256(script_path),
-        "inputs": {},
-        "outputs": {}
+        "inputs": inputs,    # No inputs needed for this script.
+        "outputs": {"custom_script_status": "PENDING"}
     }
 
-    response = client_no_auth.post("/api/v3/custom_script/start", json=payload)
+    response = auth_client.post("/api/v3/custom_script/start", json=payload, headers={"Authorization": f"Bearer {expired_jwt_token}"})
+
+    assert response.status_code == 403, (
+        f"Unexpected status {response.status_code}: {response.text}"
+    )
+
+
+def test_start_custom_script_unauthorized(auth_client, no_scope_jwt_token):
+    """
+    Verify that the `/api/v3/custom_script/start` endpoint works when a
+    correctly‑signed JWT is supplied (the `client` fixture adds the header).
+    """
+    script_path = Path(__file__).parent / "custom_script_for_tests" / "test_cs.py"
+    assert script_path.is_file(), f"Script not found: {script_path}"
+
+    inputs = {'inputs': {'duration': 30,
+                         'script_result': 'PASS'}}
+
+    payload = {
+        "scriptName": "test_cs",
+        "scriptPath": "custom_script_for_tests/test_cs.py",
+        "scriptHash": _sha256(script_path),
+        "inputs": inputs,    # No inputs needed for this script.
+        "outputs": {"custom_script_status": "PENDING"}
+    }
+
+    response = auth_client.post("/api/v3/custom_script/start", json=payload, headers={"Authorization": f"Bearer {no_scope_jwt_token}"})
 
     assert response.status_code == 401, (
-        f"Expected 401 Unauthorized, got {response.status_code}"
+        f"Unexpected status {response.status_code}: {response.text}"
     )
+
   
