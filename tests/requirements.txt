@@ -3,3 +3,4 @@ requests>=2.29
 PyJWT==1.7.0
 cryptography==2.4.2
 httpx
+pytest-timeout
