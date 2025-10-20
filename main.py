@@ -1,32 +1,7 @@
 import logging
 import sys
 from starlette.concurrency import iterate_in_threadpool
-
-def restore_root_logger():
-    # restore root logger that was crippled by MTAK
-    root_logger = logging.getLogger()
-    root_logger.setLevel(logging.DEBUG)
-    for handler in root_logger.handlers:
-        handler.setLevel(logging.DEBUG)
-
-def listloggers():
-    rootlogger = logging.getLogger()
-    print(rootlogger)
-    for h in rootlogger.handlers:
-        print('     %s' % h)
-
-    for nm, lgr in logging.Logger.manager.loggerDict.items():
-        if isinstance(lgr, logging.PlaceHolder):
-            print('+ [%-20s] %s' % (nm, lgr))
-        else:
-            print('+ [%-20s] %s propagate: %s' % (nm, lgr, lgr.propagate))
-            for h in lgr.handlers:
-                print('     %s' % h)
-
-# import this first since MTAK messes up logging of other modules
 from core import venue_core
-restore_root_logger()
-
 import os
 
 logger = logging.getLogger(__name__)
@@ -86,7 +61,6 @@ prefix_router = APIRouter(prefix='/api/v3')
                     tags=['HEALTH']
                 )
 def health() -> HealthStatus:
-    # listloggers()
     return HealthStatus(status=HealthStatusEnum.OK.value, message='')
 
 
@@ -297,7 +271,7 @@ def custom_openapi():
             return app.openapi_schema
         openapi_schema = get_openapi(
             title='Ingenium VenueServer',
-            version='14.1-TP',
+            version='15.0',
             description='RESTful API of Ingenium VenueServer that interfaces with test venues',
             routes=app.routes,
             tags=tags_metadata

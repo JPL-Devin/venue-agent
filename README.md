@@ -1,8 +1,8 @@
-# Ingenium Venue Server (Refactored by Using FastAPI)
+# Ingenium Venue Agent
 
 ## For developers
 
-For development, you need to run VenueServer web application.
+For development, you need to run Venue Agent (Venue Server) web application.
 It is assumed that REDIS service is already running.
 
 ### Set Up Python Virtual Environment
@@ -12,12 +12,12 @@ Run the following script to set up a Python virtual environment as `venv3`.
 The script will also generate an NGINX configuration file (`nginx.conf`) from a template (`nginx.conf.template`). 
 You do not need to run nginx for local development.
 
-The set up script takes a file (e.g., `config/project_dev_envs.sh`) that contains a few environment variables. You will need to update
+The set up script takes a file (e.g., `config/venueserver_dev_envs.sh`) that contains a few environment variables. You will need to update
 the environment variables according to your environment.
 
 For example:
 ```
-$ ./setup_venueserver.sh -f config/project_dev_envs.sh
+$ ./setup_venueserver.sh -f config/venueserver_dev_envs.sh
 ```
 
 ### REDIS
@@ -32,12 +32,12 @@ $ ps -ealf | grep redis-server
 ### Start VenueServer
 
 The start up shell script takes the port number and environment variable files as inputs. 
-In the example below, VenueServer listens to port 19443.  NGINX will map port 9443 to this port.
+In the example below, VenueServer listens to port 19443. NGINX will map port 9443 to this port.
 
 You can run multiple instances of VenueServer with different ports such as 19444 (2nd instance) and 19445 (3rd instance).
 
 ```
-$ ./start_venueserver.sh -p 19443 -f config/europa_dev_envs.sh
+$ ./start_venueserver.sh -p 19443 -f config/venueserver_dev_envs.sh
 ```
 
 VenueServer will be accessible from `http://localhost:19443/api/v3/health`
@@ -56,7 +56,7 @@ A single instance of NGINX serves mutliple instances of Venue Server.
 $ ./start_nginx.sh start
 ```
 
-VenueServer will be accessible from `https://<hostname>.jpl.nasa.gov:9443/api/v3/health`
+VenueServer will be accessible from `https://fullhostname:9443/api/v3/health`
 
 #### Stop NGINX
 ```
@@ -85,7 +85,7 @@ some of the environment variables will vary depending on GDS hosts.
 
 The list of environment variables can be found in:
 
-- Project: `config/project_dev_envs.sh`
+- Project: `config/venueserver_dev_envs.sh`
 
 
 GDS team will need to create a deployment script that will create a file that defines the environment variables.
@@ -105,7 +105,7 @@ Note that `ING_LOG_DIR` needs to be parameterized by using `$USER` so that each 
 
 ### Step 3: Create a Python Virtual Environment and Generate a NGINX configuration file
 
-Run the set up script with the environment variables from Step 3. 
+Run the set up script with the environment variables from Step 2. 
 
 $ ./setup_venueserver.sh -f venueserver_envs.sh
 
@@ -116,11 +116,11 @@ $ ./setup_venueserver.sh -f venueserver_envs.sh
 
 Create an NGINX systemctl service. A single instance of NGINX will serve multiple instances of VenueServer.
 
-NGINX service will run as the primary Ingenium user (e.g. 'project-ing') by running the command below.
+NGINX service will run as the primary Ingenium user (e.g. `ing-user`) by running the command below.
 
 | systemctl definition      |  Instruction                |
 |---------------------------|-----------------------------|
-| User account              | `project-ing'   |
+| User account              | ing-user   |
 | Start command             | ./start_nginx.sh start      |
 | Stop command              | ./start_nginx.sh stop       |
 
@@ -148,7 +148,7 @@ If multiple instances of VenueServer are running for a Venue, set up multiple sy
 
 | systemctl definition      |  Instruction                                               |
 |---------------------------|------------------------------------------------------------|
-| User account              | `project-ing'                                 |
+| User account              | ing-user                                 |
 | Start command             | ./start_venueserver.sh -f venueserver_envs.sh -p 19443     |
 | Stop command              | SEND SIGINT                                                |
 | health check              | https://fullhostname:9443/api/v3/health                        |
@@ -157,7 +157,7 @@ If multiple instances of VenueServer are running for a Venue, set up multiple sy
 
 | systemctl definition      |  Instruction                                               |
 |---------------------------|------------------------------------------------------------|
-| User account              | `project-ing2'                                  |
+| User account              | ing-user2                                  |
 | Start command             | ./start_venueserver.sh -f venueserver_envs.sh -p 19444     |
 | Stop command              | SEND SIGINT                                                |
 | health check              | https://fullhostname:9444/api/v3/health                        |
