@@ -238,7 +238,6 @@ async def log_request(request: Request, call_next):
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc:RequestValidationError):
     error_payload = {"detail": exc.errors()}
-    #error_json_str = json.dumps(exc.json(indent=None))
     return JSONResponse(status_code=400, 
         content=error_payload)
 
@@ -270,9 +269,9 @@ def custom_openapi():
         if app.openapi_schema:
             return app.openapi_schema
         openapi_schema = get_openapi(
-            title='Ingenium VenueServer',
+            title='Ingenium Venue Agent',
             version='15.0',
-            description='RESTful API of Ingenium VenueServer that interfaces with test venues',
+            description='RESTful API of Ingenium Venue Agent that interfaces with test venues',
             routes=app.routes,
             tags=tags_metadata
         )

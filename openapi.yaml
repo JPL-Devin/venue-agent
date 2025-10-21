@@ -262,16 +262,6 @@ components:
           description: Verification status for the specified entry
       title: ScriptEntriesModel
       type: object
-    ScriptHaltBodyModel:
-      properties:
-        scriptRunId:
-          description: custom script ID for the running custom script
-          title: Scriptrunid
-          type: string
-      required:
-        - scriptRunId
-      title: ScriptHaltBodyModel
-      type: object
     ScriptRunInfo:
       properties:
         scriptRunId:
@@ -312,16 +302,6 @@ components:
         - scriptHash
       title: ScriptStartBodyModel
       type: object
-    ScriptStatusBodyModel:
-      properties:
-        scriptRunId:
-          description: custom script ID for the running custom script
-          title: Scriptrunid
-          type: string
-      required:
-      - scriptRunId
-      title: ScriptStatusBodyModel
-      type: object      
     ScriptStatusResp:
       properties:
         custom_script_outputs:
