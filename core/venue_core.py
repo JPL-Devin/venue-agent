@@ -25,7 +25,8 @@ _custom_script_base_dir = get_env('CUSTOM_SCRIPT_BASE_DIR')
 
 def _load_json_with_retry(path: str, max_attempts: int=5, delay: float = 0.1):
   """
-  This function will retry 
+  This function will retry the loading of a json file (specifically output.json) in case it is being actively written
+  to when the load attempt starts.
   
   """
 
