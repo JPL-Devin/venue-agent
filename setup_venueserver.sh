@@ -10,7 +10,7 @@ usage() {
     Options:
       -f ENV_FILE: path to a file that defines environment variables (required)
     Example:
-      $0 -f config/europa_dev_envs.sh
+      $0 -f config/venueserver_dev_envs.sh
   "
 }
 
@@ -49,29 +49,15 @@ else
   exit 1
 fi
 
-
-if [[ -z "$ING_MTAK_DIR" ]] 
-then
-  echo "Error: ING_MTAK_DIR env variable is not defined"  
-  exit 1
-fi
-
 if [[ -d "$VENV_DIR" ]] 
 then
     echo "Use existing Python virtual env: $VENV_DIR"
 else
     echo "Creating a Python virtual env: $VENV_DIR"
-    virtualenv -p python3 $VENV_DIR
+    python3.12 -m venv $VENV_DIR
 fi
 
-AMPCS_REQUIREMENTS="$ING_MTAK_DIR/ampcs_requirements.txt"
 REQUIREMENTS="$SCRIPT_DIR/requirements.txt"
-
-if [[ ! -f "$AMPCS_REQUIREMENTS" ]] 
-then
-  echo "Error: $AMPCS_REQUIREMENTS file not found"  
-  exit 1
-fi
 
 if [[ ! -f "$REQUIREMENTS" ]] 
 then
@@ -79,15 +65,10 @@ then
   exit 1
 fi
 
-
 source $VENV_DIR/bin/activate
-pip install -U pip
-echo "Installing AMPCS Python dependencies from $AMPCS_REQUIREMENTS"
-pip install -r "$AMPCS_REQUIREMENTS"
+python -m pip install -U pip
 echo "Installing Python dependencies from $REQUIREMENTS"
-pip install -r "$REQUIREMENTS"
-# uvicorn requires click version 7 or later
-pip install --ignore-installed "click>=7.0.0"
+python -m pip install -r "$REQUIREMENTS"
 
 #
 # Generate nginx configuration file
