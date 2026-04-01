@@ -19,6 +19,14 @@ import time
 
 from .core_utils import get_env
 
+import os as _os_env
+_redis_host = _os_env.environ.get('REDIS_HOST', 'localhost')
+_redis_port = int(_os_env.environ.get('REDIS_PORT', '6379'))
+_redis_password = _os_env.environ.get('REDIS_PASSWORD', None)
+
+def _get_redis():
+    return redis.StrictRedis(host=_redis_host, port=_redis_port, db=0, password=_redis_password)
+
 CUSTOM_SCRIPT_LOG_PATH_BASE='/tmp/cs'
 
 _custom_script_base_dir = get_env('CUSTOM_SCRIPT_BASE_DIR')
@@ -155,7 +163,7 @@ def launch_script(path_to_script, inputs, outputs):
     preexec_fn=os.setsid, env=script_env, stdout=log_file, stderr=log_file)
   process_pid = process.pid
 
-  r = redis.StrictRedis(host='localhost', port=6379, db=0)
+  r = _get_redis()
 
   process_redis_data = {
     'process_id': str(process_pid),
@@ -175,7 +183,8 @@ def get_script_log_lines(log_file_path):
 
   log_lines_list = []
 
-  last_lines = tailer.tail(open(log_file_path), 25)
+  with open(log_file_path) as f:
+    last_lines = tailer.tail(f, 25)
 
   for l in last_lines:
     # remove the pesky "/n" at the end of each log line
@@ -300,7 +309,7 @@ def get_custom_script_status(script_run_id):
   logger.debug(f'Getting the custom script status for script_run_id: {script_run_id}')
 
   # get script information via script ID from Redis
-  r = redis.StrictRedis(host='localhost', port=6379, db=0)
+  r = _get_redis()
 
   try:
     script_info_redis = json.loads(r.get(script_run_id))
@@ -384,7 +393,7 @@ def halt_custom_script(script_run_id):
   logger.debug(f'Halting custom script for script_run_id: {script_run_id}')
 
   # get script information via script ID from Redis 
-  r = redis.StrictRedis(host='localhost', port=6379, db=0)
+  r = _get_redis()
   try:
     script_info_redis = json.loads(r.get(script_run_id))
   except Exception as ex:
@@ -412,7 +421,7 @@ def halt_custom_script(script_run_id):
   # if the process group doesn't exist, it needs to exit gracefully
   try:
     os.killpg(os.getpgid(pid), signal.SIGTERM)
-  except:
+  except Exception:
     logger.warning(f'Error when killing process group for pid: {pid}. The process may not exist any more.')
 
   # delete script (session) id from Redis (keep Redis clean)
@@ -428,7 +437,7 @@ def get_custom_script_files(script_run_id):
   #custom_script_temp_dir = os.path.join(CUSTOM_SCRIPT_LOG_PATH_BASE, script_run_id)
 
   # get script information via script ID from Redis
-  r = redis.StrictRedis(host="localhost", port=6379, db=0)
+  r = _get_redis()
 
   try:
     script_info_redis = json.loads(r.get(script_run_id))

@@ -28,6 +28,3 @@ def get_env (env_var,cast_type=str):
     elif (cast_type == int):
       return int(val)
   return None
-
-class TimeoutError(Exception):
-  pass
