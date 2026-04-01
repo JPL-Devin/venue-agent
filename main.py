@@ -237,7 +237,14 @@ async def log_request(request: Request, call_next):
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc:RequestValidationError):
-    error_payload = {"detail": exc.errors()}
+    errors = exc.errors()
+    for error in errors:
+        ctx = error.get('ctx')
+        if ctx:
+            for key, value in ctx.items():
+                if not isinstance(value, (str, int, float, bool, list, dict, type(None))):
+                    ctx[key] = str(value)
+    error_payload = {"detail": errors}
     return JSONResponse(status_code=400, 
         content=error_payload)
 

@@ -60,8 +60,10 @@ def test_start_custom_script_abs_path(auth_client: TestClient):
 
     tmp_path = Path("/tmp/venue_agent_test/custom_script_for_tests.py")
 
-    if not os.path.exists('/tmp/venue_agent_test'):
-        os.makedirs(tmp_path, exist_ok=True)
+    # Clean up any stale artifacts from previous runs
+    if tmp_path.exists() and tmp_path.is_dir():
+        shutil.rmtree(tmp_path)
+    os.makedirs(tmp_path.parent, exist_ok=True)
 
     shutil.copyfile(script_path, tmp_path)
     os.chmod(tmp_path, 0o777)
@@ -97,8 +99,10 @@ def test_start_custom_script_rel_bad_path(auth_client: TestClient):
 
     tmp_path = Path("../../../../../tmp/venue_agent_test/custom_script_for_tests.py")
 
-    if not os.path.exists('/tmp/venue_agent_test'):
-        os.makedirs(tmp_path, exist_ok=True)
+    # Clean up any stale artifacts from previous runs
+    if tmp_path.exists() and tmp_path.is_dir():
+        shutil.rmtree(tmp_path)
+    os.makedirs(tmp_path.parent, exist_ok=True)
 
     shutil.copyfile(script_path, tmp_path)
     os.chmod(tmp_path, 0o777)
