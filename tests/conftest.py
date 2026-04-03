@@ -105,10 +105,10 @@ def expired_jwt_token():
     now_ts = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
     payload = {
         "sub": "test_user",            # subject – can be any identifier
-        "iat": now_ts,                    # issued‑at
-        "exp": now_ts + 3600,  # expires in 1 hour
+        "iat": now_ts - 7200,          # issued 2 h ago
+        "exp": now_ts - 3600,          # expired 1 h ago
         "iss": "test_suite",
-        "scopes": [{}]
+        "scopes": [{"scope": "execute:testbed"}]
     }
 
     token = jwt.encode(payload, private_key, algorithm=algorithm)
@@ -134,10 +134,10 @@ def no_scope_jwt_token():
     now_ts = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
     payload = {
         "sub": "test_user",            # subject – can be any identifier
-        "iat": now_ts - 7200,          # issued 2 h ago
-        "exp": now_ts - 3600,          # expired 1 h ago
+        "iat": now_ts,                    # issued-at
+        "exp": now_ts + 3600,  # expires in 1 hour
         "iss": "test_suite",
-        "scopes": [{"scope": "execute:testbed"}]
+        "scopes": [{}]
     }
 
     token = jwt.encode(payload, private_key, algorithm=algorithm)
