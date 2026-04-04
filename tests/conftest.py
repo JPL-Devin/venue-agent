@@ -60,6 +60,13 @@ def per_test_logging(request, tmp_path):
     # ------------------------------------------------------------------
     yield log_file
 
+    # ------------------------------------------------------------------
+    # 4️⃣ Teardown: remove handler and close file to prevent resource leak.
+    # ------------------------------------------------------------------
+    root_logger = logging.getLogger()
+    root_logger.removeHandler(file_handler)
+    file_handler.close()
+
 
 @pytest.fixture(scope="session")
 def jwt_token():
