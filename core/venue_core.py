@@ -21,8 +21,8 @@ from .core_utils import get_env
 
 import os as _os_env
 _redis_host = _os_env.environ.get('REDIS_HOST', 'localhost')
-_redis_port = int(_os_env.environ.get('REDIS_PORT', '6379'))
-_redis_password = _os_env.environ.get('REDIS_PASSWORD', None)
+_redis_port = int(_os_env.environ.get('REDIS_PORT', '') or '6379')
+_redis_password = _os_env.environ.get('REDIS_PASSWORD', '') or None
 
 def _get_redis():
     return redis.StrictRedis(host=_redis_host, port=_redis_port, db=0, password=_redis_password)
