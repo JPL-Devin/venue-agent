@@ -60,8 +60,10 @@ def test_start_custom_script_abs_path(auth_client: TestClient):
 
     tmp_path = Path("/tmp/venue_agent_test/custom_script_for_tests.py")
 
-    if not os.path.exists('/tmp/venue_agent_test'):
-        os.makedirs(tmp_path, exist_ok=True)
+    # Clean up any stale artifacts from previous runs
+    if tmp_path.exists() and tmp_path.is_dir():
+        shutil.rmtree(tmp_path)
+    os.makedirs(tmp_path.parent, exist_ok=True)
 
     shutil.copyfile(script_path, tmp_path)
     os.chmod(tmp_path, 0o777)
@@ -97,8 +99,10 @@ def test_start_custom_script_rel_bad_path(auth_client: TestClient):
 
     tmp_path = Path("../../../../../tmp/venue_agent_test/custom_script_for_tests.py")
 
-    if not os.path.exists('/tmp/venue_agent_test'):
-        os.makedirs(tmp_path, exist_ok=True)
+    # Clean up any stale artifacts from previous runs
+    if tmp_path.exists() and tmp_path.is_dir():
+        shutil.rmtree(tmp_path)
+    os.makedirs(tmp_path.parent, exist_ok=True)
 
     shutil.copyfile(script_path, tmp_path)
     os.chmod(tmp_path, 0o777)
@@ -612,7 +616,7 @@ def test_start_custom_script_expired(auth_client: TestClient, expired_jwt_token)
 
     response = auth_client.post("/api/v3/custom_script/start", json=payload, headers={"Authorization": f"Bearer {expired_jwt_token}"})
 
-    assert response.status_code == 403, (
+    assert response.status_code == 401, (
         f"Unexpected status {response.status_code}: {response.text}"
     )
 
@@ -638,7 +642,7 @@ def test_start_custom_script_unauthorized(auth_client, no_scope_jwt_token):
 
     response = auth_client.post("/api/v3/custom_script/start", json=payload, headers={"Authorization": f"Bearer {no_scope_jwt_token}"})
 
-    assert response.status_code == 401, (
+    assert response.status_code == 403, (
         f"Unexpected status {response.status_code}: {response.text}"
     )
 
@@ -778,7 +782,7 @@ def test_status_custom_script_expired(auth_client: TestClient, expired_jwt_token
 
     response = auth_client.get(f"/api/v3/custom_script/{script_run_id}", headers={"Authorization": f"Bearer {expired_jwt_token}"})
 
-    assert response.status_code == 403, (
+    assert response.status_code == 401, (
         f"Unexpected status {response.status_code}: {response.text}"
     )
 
@@ -818,7 +822,7 @@ def test_status_custom_script_unauthorized(auth_client: TestClient, no_scope_jwt
     response = auth_client.get(f"/api/v3/custom_script/{script_run_id}",
                                headers={"Authorization": f"Bearer {no_scope_jwt_token}"})
 
-    assert response.status_code == 401, (
+    assert response.status_code == 403, (
         f"Unexpected status {response.status_code}: {response.text}"
     )
 
@@ -872,7 +876,7 @@ def test_custom_script_halt_unauthorized(auth_client: TestClient, no_scope_jwt_t
 
     response = auth_client.post(f"/api/v3/custom_script/{script_run_id}/halt", headers={"Authorization": f"Bearer {no_scope_jwt_token}"})
 
-    assert response.status_code == 401, (
+    assert response.status_code == 403, (
         f"Unexpected status {response.status_code}: {response.text}"
     )
 
@@ -926,7 +930,7 @@ def test_custom_script_halt_expired(auth_client: TestClient, expired_jwt_token):
 
     response = auth_client.post(f"/api/v3/custom_script/{script_run_id}/halt", headers={"Authorization": f"Bearer {expired_jwt_token}"})
 
-    assert response.status_code == 403, (
+    assert response.status_code == 401, (
         f"Unexpected status {response.status_code}: {response.text}"
     )
 
@@ -979,7 +983,7 @@ def test_custom_script_files_unauthorized(auth_client: TestClient, no_scope_jwt_
 
     files = auth_client.get(f"/api/v3/custom_script/{script_run_id}/files", headers={"Authorization": f"Bearer {no_scope_jwt_token}"} )
 
-    assert files.status_code == 401, f"Unexpected status {files.status_code}: {files.text}"
+    assert files.status_code == 403, f"Unexpected status {files.status_code}: {files.text}"
 
 
 @pytest.mark.timeout(45)
@@ -1030,5 +1034,5 @@ def test_custom_script_files_expired(auth_client: TestClient, expired_jwt_token)
 
     files = auth_client.get(f"/api/v3/custom_script/{script_run_id}/files", headers={"Authorization": f"Bearer {expired_jwt_token}"})
 
-    assert files.status_code == 403, f"Unexpected status {files.status_code}: {files.text}"
+    assert files.status_code == 401, f"Unexpected status {files.status_code}: {files.text}"
 

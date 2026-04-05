@@ -75,7 +75,7 @@ class WorkerProcess(object):
             try:
                 logger.info(f'Killing child process. pid: {child_process.pid}')
                 os.kill(child_process.pid, signal.SIGKILL)
-            except:
+            except Exception:
                 logger.warning(f'Error when killing child process. child_process.pid: {child_process.pid} error: {traceback.format_exc()}')
 
         # Wait until the process is killed
@@ -84,7 +84,7 @@ class WorkerProcess(object):
         try:
             logger.info(f'Killing worker process. pid: {self.pid}')
             os.kill(self.pid, signal.SIGKILL)
-        except:
+        except Exception:
             logger.warning(f'Error when force killing worker process. pid: {self.pid} error: {traceback.format_exc()}')
         
         time_start = time.time()
@@ -144,7 +144,7 @@ class WorkerProcess(object):
                 is_future_done = self.future.done()
                 logger.info(f'is_running is_future_done: {is_future_done}')
                 return not is_future_done
-            except:
+            except Exception:
                 logger.warning(f'Failed to determine task status. error: {traceback.format_exc()}')
                 # This should not happen. 
                 # But if this happens, the future status was not determined. 

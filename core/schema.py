@@ -1,5 +1,5 @@
 from pathlib import Path
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from typing import List
 from enum import Enum
 
@@ -24,7 +24,8 @@ class ScriptStartBodyModel(BaseModel):
     # service accepts empty outputs
     outputs: dict = Field({}, description='Dictionary of custom script outputs')
 
-    @validator('scriptPath')
+    @field_validator('scriptPath')
+    @classmethod
     def script_path_must_be_relative(cls, v:str)->str:
         if Path(v).is_absolute():
             raise ValueError('scriptPath must be relative path, not an absolute path')

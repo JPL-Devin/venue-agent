@@ -89,7 +89,7 @@ def script_start(body: ScriptStartBodyModel, request: Request, response: Respons
         msg = f'Failed to start a custom script: {body.scriptPath}'
         logging.exception(msg)
         response.status_code = 400
-        return ErrorResponse(message=f'{msg}. {traceback.format_exc()}')
+        return ErrorResponse(message=msg)
 
 
 @prefix_router.get('/custom_script/{script_run_id}',
@@ -111,7 +111,7 @@ def script_status(script_run_id: str, response: Response):
         msg = f'Failed to get the status of custom script: {script_run_id}'
         logging.exception(msg)
         response.status_code = 400
-        return ErrorResponse(message=f'{msg}. {traceback.format_exc()}')
+        return ErrorResponse(message=msg)
 
 
 @prefix_router.post('/custom_script/{script_run_id}/halt',
@@ -133,7 +133,7 @@ def script_halt(script_run_id, response: Response):
         msg = f'Failed to halt custom script: {script_run_id}'
         logging.exception(msg)
         response.status_code = 400
-        return ErrorResponse(message=f'{msg}. {traceback.format_exc()}')
+        return ErrorResponse(message=msg)
 
 
 @prefix_router.get('/custom_script/{script_run_id}/files',
@@ -156,7 +156,7 @@ def script_file(script_run_id: str, response: Response):
         msg = f'Failed to get custom script files. script_run_id: {script_run_id}'
         logging.exception(msg)
         response.status_code = 400
-        return ErrorResponse(message=f'{msg}. {traceback.format_exc()}')
+        return ErrorResponse(message=msg)
 
 
 # router needs to be added after end point definitions
@@ -190,7 +190,7 @@ async def check_jwt(request: Request, call_next):
             request.state.username = jwt_decoded.get('username', '')
         except Exception:
             return JSONResponse(status_code=401, 
-                content={'message': f'Invalid API token. {traceback.format_exc()}'})
+                content={'message': 'Invalid API token.'})
 
         if utils.has_permission(jwt_decoded):
             return await call_next(request)
@@ -237,7 +237,14 @@ async def log_request(request: Request, call_next):
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc:RequestValidationError):
-    error_payload = {"detail": exc.errors()}
+    errors = exc.errors()
+    for error in errors:
+        ctx = error.get('ctx')
+        if ctx:
+            for key, value in ctx.items():
+                if not isinstance(value, (str, int, float, bool, list, dict, type(None))):
+                    ctx[key] = str(value)
+    error_payload = {"detail": errors}
     return JSONResponse(status_code=400, 
         content=error_payload)
 
@@ -285,7 +292,7 @@ def custom_openapi():
         # cache the schema
         app.openapi_schema = openapi_schema
         return app.openapi_schema
-    except:
+    except Exception:
         logger.error(traceback.format_exc())
 
 # override openapi method

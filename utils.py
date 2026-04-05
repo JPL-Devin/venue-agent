@@ -17,8 +17,8 @@ key_crc32 = None
 
 try:
   logger.info(f'Loading public key from: {public_pem_path}')
-  exec_venue_public_pem_file = open(public_pem_path, 'r')
-  exec_venue_public_pem = exec_venue_public_pem_file.read()
+  with open(public_pem_path, 'r') as exec_venue_public_pem_file:
+    exec_venue_public_pem = exec_venue_public_pem_file.read()
   exec_venue_public_pem_barray = bytearray()
   exec_venue_public_pem_barray.extend(map(ord, exec_venue_public_pem))
   key_crc32 = hex(zlib.crc32(exec_venue_public_pem_barray) & 0xffffffff)
@@ -51,7 +51,7 @@ def get_decoded_token (authorization_header):
   # This may throw an exception.
   # The caller should handle it
   jwt_decoded = jwt.decode(
-    jwt_token, exec_venue_public_pem, algorithms='RS256')
+    jwt_token, exec_venue_public_pem, algorithms=['RS256'])
 
   return jwt_decoded
 
